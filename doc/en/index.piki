@@ -1,0 +1,195 @@
+* Piki -- a command line WIKI
+
+{right
+Kazu Yamamoto\<br /\>
+2009.4.6\<br /\>
+}
+
+Piki is yet another WIKI. Like other WIKI systems, Piki provides
+simple notations to express document structures. But unlike them, 
+it does not use Web servers. 
+"piki" is a command line program to convert a Piki text file to
+an HTML file.
+
+"piki" is written in 
+[Parsec http://legacy.cs.uu.nl/daan/download/parsec/parsec.html], 
+a functional parser of [Haskell http://www.haskell.org].
+You can download Piki version 0.3 from [hackageDB http://hackage.haskell.org/packages/archive/pkg-list.html].
+
+** The "piki" command
+
+"piki" takes an HTML template file (say "template.html") and a Piki
+text file (say "index.piki") as arguments and produces an HTML file
+(say "index.html"):
+
+>|
+% piki template.html index.piki > index.html
+|<
+
+"template.html" should contain HTML meta information. "piki" converts
+"$body" with the contents produced with the Piki file.  And it
+replaces "$title" of the contents of the first <h1>.
+
+You can see an example of [template.html template.html] with
+"view source" of your browser. You should also see
+an example of [index.piki index.piki].
+
+**The Piki notation
+
+Like other WIKI systems, most of the Piki notation use the first character
+of lines.
+
+***Comments
+
+The lines which start with "#" are ignored.
+
+>|
+# Comment. Ignored.
+|<
+
+***Horizontal rule
+
+The line which starts with "=" is horizontal rule(<hr />). 
+All characters after "=" are ignored.
+
+>|
+================================================================
+|<
+
+
+***Headline
+
+The <h?> tag can be expressed with "*". The number of "*" indicates
+level.
+
+>|
+* First level Headline (h1)
+** Second level headline (h2)
+|<
+
+***Lists
+
+"-" and "+" indicates unordered list item(<ul>) and ordered list
+item(<ol>), respectively. You can use both at the same time,
+recursively.
+
+>|
+- level 1
+++ level 2 with number
+++ level 2 with number
+- level 1
+++ level 2 with number
+++ level 2 with number
++++ level 3 with number
++++ level 3 with number
+- level 1
+|<
+
+*** Definition list
+
+"?" and "!" indicates title(<dt>) and corresponding description(<dd>)
+of definition list(<dl>). This notation cannot be recursive.
+
+>|
+? title 1
+! description 1
+? title 2
+! description 2
+|<
+
+*** Image
+
+"@" indicates images (<img />). "@" should be followed with
+pairs of title and URL. They should be separated with spaces. If a title
+contains spaces, it should be quoted with double quote.
+
+>|
+@ "Image of flowers" http://example.com/img/flower.jpg
+@ "My cats" cats.jpg "My dogs" dogs.jpg
+|<
+
+***Pre-formatted
+
+Pre-formatted text (<pre>) should be enclosed with ">|" and "|<"
+
+>|
+ >|
+ (define (fib n) 
+   (cond
+    ((= n 0) 0)
+    ((= n 1) 1)
+    (else
+     (+ (fib (- n 1)) (fib (- n 2))))))
+ |<
+|<
+
+***Division
+
+The lines between "{" and "}" will be a division (<div>). If upper
+letters are contained the string which follows "{", 
+they will be the value of "id". Otherwise, 
+they will be the valude of "class".
+
+>|
+{center
+Any Piki text
+}
+|<
+
+This is convenient if used with CSS.
+
+>|
+.center {
+        margin: 0px auto;
+        text-align: center;
+}
+|<
+
+***Paragraph
+
+Lines which do not start with the Piki notations organizes a paragraph(<p>).
+Paragraph separator is an empty line.
+
+>|
+Paragraph 1: was it a cat I saw?
+Yes, it was.
+
+Paragraph 2: The quick brown fox jumped over
+the vary lazy dog.
+|<
+
+***Link
+
+To express a link, use the "\[title url\]" notation. 
+If the title contains spaces, it should be quoted with double quote.
+Of course, this does not need to be placed in the beginning of lines.
+
+>|
+My favorite computer language is [Haskell http://www.haskell.org/].
+|<
+
+***Escape character
+
+Escape character is '\\'. To express "\[\]", use "\\\[\\\]".
+
+In normal cases, the HTML special characters are converted to 
+the character references. For example, '<' is converted to "&lt;".
+
+If the special characters are escaped, they are not 
+converted to the character references.
+
+Here is an interesting example:
+
+>|
+{right
+Kazu Yamamoto\<br /\>
+2009.4.6
+}
+|<
+
+>|
+.right {
+	text-align: right;
+	padding-right: 16px;
+}
+|<

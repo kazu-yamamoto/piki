@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" media="all" />
+<title>Piki -- コマンドライン WIKI</title>
+</head>
+<body>
+<div id="main">
+
+<h1>Piki -- コマンドライン WIKI</h1>
+<div class="right">
+<p>山本和彦<br />
+2009.4.6<br /></p>
+</div>
+<p>Piki は、WIKI の一種です。他の WIKI と同様、Piki は文章の構造を表現するための簡潔な記法を提供します。しかし他の WIKI と違って、Web サーバーを使いません。&quot;piki&quot; は、Piki ファイルを HTML ファイルに変換するためのコマンドライン・プログラムです。</p>
+<p>&quot;piki&quot; は、<a href="http://www.haskell.org">Haskell</a> の関数型パーサーである <a href="http://legacy.cs.uu.nl/daan/download/parsec/parsec.html">Parsec</a> で書かれています。現在、Piki version 0.3 が<a href="http://hackage.haskell.org/packages/archive/pkg-list.html">hackageDB</a>で公開されています。</p>
+<h2>&quot;piki&quot; コマンド</h2>
+<p>&quot;piki&quot; は、HTML 雛形ファイル(&quot;template.html&quot;とする) と Piki 記法で書かれたファイル(&quot;index.piki&quot;とする)をコマンドライン引数に取り、HTML ファイル(&quot;index.html&quot; とする)を出力します。</p>
+<pre>
+% piki template.html index.piki &gt; index.html
+</pre>
+<p>&quot;template.html&quot; には HTML のメタ情報を記述します。&quot;piki&quot; は、Piki ファイル中の &quot;$body&quot; を Piki ファイルから生成したコンテンツで置き換えます。また、&quot;$title&quot; を 最初の &lt;h1&gt; の値で置き換えます。</p>
+<p><a href="template.html">template.html</a> の例は、ブラウザーの「ソースを見る」で表示できるでしょう。<a href="index.piki">index.piki</a> の例も表示してみて下さい。</p>
+<p>Piki ファイルは、UTF-8 で書いて下さい。</p>
+<h2>Piki 記法</h2>
+<p>他の WIKI システムと同様に、多くの Piki 記法は行頭の文字を利用します。</p>
+<h3>コメント</h3>
+<p>&quot;#' で始まる行は無視されます。</p>
+<pre>
+# コメント。無視される。
+</pre>
+<h3>罫線</h3>
+<p>&quot;=&quot; で始まる行は、罫線(&lt;hr /&gt;)になります。&quot;=&quot; 以降の文字は無視されます。</p>
+<pre>
+================================================================
+</pre>
+<h3>見出し</h3>
+<p>&lt;h?&gt; タグは &quot;*&quot; で表現します。&quot;*&quot; の数は、見出しのレベルを表します。</p>
+<pre>
+* レベル1の見出し (h1)
+** レベル2の見出し (h2)
+</pre>
+<h3>Lists</h3>
+<p>&quot;-&quot; と &quot;+&quot; は、それぞれ番号なしリスト(&lt;ul&gt;)と番号付きリスト(&lt;ol&gt;)を表します。両方を同時に再帰的に利用できます。</p>
+<pre>
+- レベル 1
+++ 番号付きのレベル 2
+++ 番号付きのレベル 2
+- レベル 1
+++ 番号付きのレベル 2
+++ 番号付きのレベル 2
++++ 番号付きのレベル 3
++++ 番号付きのレベル 3
+- level 1
+</pre>
+<h3>定義リスト</h3>
+<p>&quot;?&quot; と &quot;!&quot; は、それぞれ定義リスト(&lt;d&gt;)のタイトル(&lt;dt&gt;)と説明(&lt;dd&gt;)を表します。この記法は再帰的に利用できません。</p>
+<pre>
+? タイトル 1
+! 説明 1
+? タイトル 2
+! 説明 2
+</pre>
+<h3>画像</h3>
+<p>&quot;@&quot; は画像(&lt;img /&gt;)を意味します。&quot;@&quot; には、タイトルと URL の組が続きます。それらは、空白で区切ります。タイトルが空白を含む場合は、ダブルクオートで囲む必要があります。</p>
+<pre>
+@ &quot;Image of flowers&quot; http://example.com/img/flower.jpg
+@ 僕の猫 cats.jpg 私の犬 dogs.jpg
+</pre>
+<h3>整形済みテキスト</h3>
+<p>整形済みテキスト(&lt;pre&gt;)は、&quot;&gt;|&quot; と &quot;|&lt;&quot; で囲みます。</p>
+<pre>
+ &gt;|
+ (define (fib n) 
+   (cond
+    ((= n 0) 0)
+    ((= n 1) 1)
+    (else
+     (+ (fib (- n 1)) (fib (- n 2))))))
+ |&lt;
+</pre>
+<h3>区域</h3>
+<p>&quot;{&quot; と &quot;}&quot; で囲まれた行は、区域(&lt;div&gt;)になります。&quot;{&quot; の後に大文字が含まれていると、それは &quot;id&quot; の値になります。それ以外は、&quot;class&quot; の値になります。</p>
+<pre>
+{center
+なんらかの Piki テキスト
+}
+</pre>
+<p>CSS と一緒に利用すると便利です。</p>
+<pre>
+.center {
+        margin: 0px auto;
+        text-align: center;
+}
+</pre>
+<h3>段落</h3>
+<p>Piki 記法で始まらない行は、段落(&lt;p&gt;)になります。段落の区切りは、空行です。</p>
+<pre>
+第一段落：日本語では、一行に書く方がいいでしょう。
+
+第二段落：English can be spread into 
+multiple lines.
+</pre>
+<h3>リンク</h3>
+<p>リンクを張るには、&quot;[title url]&quot; という記法を用います。タイトルが空白を含む場合は、ダブルクオートで囲む必要があります。もちろん、この記法は行頭でなくとも使えます。</p>
+<pre>
+僕の好きなコンピュータ言語は [Haskell http://www.haskell.org/] です。
+</pre>
+<h3>回避文字</h3>
+<p>回避文字は '\' です。&quot;[]&quot; と表示するには &quot;\[\]&quot; と書きましょう。</p>
+<p>通常、HTML の特殊文字は、参照文字列に変換されます。たとえば、'&lt;' は &quot;&amp;lt;&quot; に変換されます。</p>
+<p>もし、特殊文字が回避されたら、参照文字列には変換されません。以下に興味深い例を示します。</p>
+<pre>
+{right
+山本和彦\&lt;br /\&gt;
+2009.4.6
+}
+</pre>
+<pre>
+.right {
+	text-align: right;
+	padding-right: 16px;
+}
+</pre>
+
+</div>
+</body>
+</html>

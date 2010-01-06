@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=us-ascii" />
+<link rel="stylesheet" href="default.css" type="text/css" media="all" />
+<title>Piki -- a command line WIKI</title></head>
+<body>
+<div id="main">
+
+<h1>Piki -- a command line WIKI</h1>
+<div class="right">
+<p>Kazu Yamamoto<br />
+2009.4.6<br /></p>
+</div>
+<p>Piki is yet another WIKI. Like other WIKI systems, Piki provides
+simple notations to express document structures. But unlike them,
+it does not use Web servers.
+&quot;piki&quot; is a command line program to convert a Piki text file to
+an HTML file.</p>
+<p>&quot;piki&quot; is written in
+<a href="http://legacy.cs.uu.nl/daan/download/parsec/parsec.html">Parsec</a>,
+a functional parser of <a href="http://www.haskell.org">Haskell</a>.
+You can download Piki version 0.3 from <a href="http://hackage.haskell.org/packages/archive/pkg-list.html">hackageDB</a>.</p>
+<h2>The &quot;piki&quot; command</h2>
+<p>&quot;piki&quot; takes an HTML template file (say &quot;template.html&quot;) and a Piki
+text file (say &quot;index.piki&quot;) as arguments and produces an HTML file
+(say &quot;index.html&quot;):</p>
+<pre>
+% piki template.html index.piki &gt; index.html
+</pre>
+<p>&quot;template.html&quot; should contain HTML meta information. &quot;piki&quot; converts
+&quot;$body&quot; with the contents produced with the Piki file. And it
+replaces &quot;$title&quot; of the contents of the first &lt;h1&gt;.</p>
+<p>You can see an example of <a href="template.html">template.html</a> with
+&quot;view source&quot; of your browser. You should also see
+an example of <a href="index.piki">index.piki</a>.</p>
+<h2>The Piki notation</h2>
+<p>Like other WIKI systems, most of the Piki notation use the first character
+of lines.</p>
+<h3>Comments</h3>
+<p>The lines which start with &quot;#&quot; are ignored.</p>
+<pre>
+# Comment. Ignored.
+</pre>
+<h3>Horizontal rule</h3>
+<p>The line which starts with &quot;=&quot; is horizontal rule(&lt;hr /&gt;).
+All characters after &quot;=&quot; are ignored.</p>
+<pre>
+================================================================
+</pre>
+<h3>Headline</h3>
+<p>The &lt;h?&gt; tag can be expressed with &quot;*&quot;. The number of &quot;*&quot; indicates
+level.</p>
+<pre>
+* First level Headline (h1)
+** Second level headline (h2)
+</pre>
+<h3>Lists</h3>
+<p>&quot;-&quot; and &quot;+&quot; indicates unordered list item(&lt;ul&gt;) and ordered list
+item(&lt;ol&gt;), respectively. You can use both at the same time,
+recursively.</p>
+<pre>
+- level 1
+++ level 2 with number
+++ level 2 with number
+- level 1
+++ level 2 with number
+++ level 2 with number
++++ level 3 with number
++++ level 3 with number
+- level 1
+</pre>
+<h3>Definition list</h3>
+<p>&quot;?&quot; and &quot;!&quot; indicates title(&lt;dt&gt;) and corresponding description(&lt;dd&gt;)
+of definition list(&lt;dl&gt;). This notation cannot be recursive.</p>
+<pre>
+? title 1
+! description 1
+? title 2
+! description 2
+</pre>
+<h3>Image</h3>
+<p>&quot;@&quot; indicates images (&lt;img /&gt;). &quot;@&quot; should be followed with
+pairs of title and URL. They should be separated with spaces. If a title
+contains spaces, it should be quoted with double quote.</p>
+<pre>
+@ &quot;Image of flowers&quot; http://example.com/img/flower.jpg
+@ &quot;My cats&quot; cats.jpg &quot;My dogs&quot; dogs.jpg
+</pre>
+<h3>Pre-formatted</h3>
+<p>Pre-formatted text (&lt;pre&gt;) should be enclosed with &quot;&gt;|&quot; and &quot;|&lt;&quot;</p>
+<pre>
+ &gt;|
+ (define (fib n) 
+   (cond
+    ((= n 0) 0)
+    ((= n 1) 1)
+    (else
+     (+ (fib (- n 1)) (fib (- n 2))))))
+ |&lt;
+</pre>
+<h3>Division</h3>
+<p>The lines between &quot;{&quot; and &quot;}&quot; will be a division (&lt;div&gt;). If upper
+letters are contained the string which follows &quot;{&quot;,
+they will be the value of &quot;id&quot;. Otherwise,
+they will be the valude of &quot;class&quot;.</p>
+<pre>
+{center
+Any Piki text
+}
+</pre>
+<p>This is convenient if used with CSS.</p>
+<pre>
+.center {
+        margin: 0px auto;
+        text-align: center;
+}
+</pre>
+<h3>Paragraph</h3>
+<p>Lines which do not start with the Piki notations organizes a paragraph(&lt;p&gt;).
+Paragraph separator is an empty line.</p>
+<pre>
+Paragraph 1: was it a cat I saw?
+Yes, it was.
+
+Paragraph 2: The quick brown fox jumped over
+the vary lazy dog.
+</pre>
+<h3>Link</h3>
+<p>To express a link, use the &quot;[title url]&quot; notation.
+If the title contains spaces, it should be quoted with double quote.
+Of course, this does not need to be placed in the beginning of lines.</p>
+<pre>
+My favorite computer language is [Haskell http://www.haskell.org/].
+</pre>
+<h3>Escape character</h3>
+<p>Escape character is '\'. To express &quot;[]&quot;, use &quot;\[\]&quot;.</p>
+<p>In normal cases, the HTML special characters are converted to
+the character references. For example, '&lt;' is converted to &quot;&amp;lt;&quot;.</p>
+<p>If the special characters are escaped, they are not
+converted to the character references.</p>
+<p>Here is an interesting example:</p>
+<pre>
+{right
+Kazu Yamamoto\&lt;br /\&gt;
+2009.4.6
+}
+</pre>
+<pre>
+.right {
+	text-align: right;
+	padding-right: 16px;
+}
+</pre>
+
+</div>
+</body>
+</html>
