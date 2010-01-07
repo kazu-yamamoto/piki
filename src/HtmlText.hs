@@ -5,7 +5,6 @@ import Notation
 import Html
 import Tag
 import LineParser
-import ApplicativeParsec
 
 ----------------------------------------------------------------
 

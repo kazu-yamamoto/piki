@@ -1,22 +1,25 @@
-module LineParser (LineParser, reportError, satisfy, 
-                   firstChar, firstCharIs, firstCharIsNot,
+module LineParser (Parser, LineParser, reportError, satisfy, 
+                   firstChar, firstCharIs, firstCharIs', firstCharIsNot,
                    prefixIs, prefixIsNot,
-                   lexeme, clean) where
+                   lexeme, clean,
+                   module Text.Parsec, module Control.Applicative) where
 
-import Text.ParserCombinators.Parsec hiding (satisfy)
-import Text.ParserCombinators.Parsec.Error
-import Data.List
+import Control.Applicative ((<$>),(<$),(<*),(<*>),(*>))
 import Data.Char
+import Data.List
 import Notation
+import Text.Parsec hiding (satisfy)
+import Text.Parsec.Error
+import Text.Parsec.String
 
 ----------------------------------------------------------------
 
 type LineParser a = GenParser String (Maybe String) a
 
 reportError :: ParseError -> a
-reportError err = error $ "error in line " ++
-                  show (sourceLine (errorPos err) - 1) ++
-                  concatMap msgString (errorMessages err)
+reportError err = error $ "error in line "
+               ++ show (sourceLine (errorPos err) - 1)
+               ++ concatMap msgString (errorMessages err)
 
 msgString :: Message -> String
 msgString (Expect str)  = str
@@ -26,10 +29,12 @@ msgString _             = ""
 ----------------------------------------------------------------
 
 satisfy :: (String -> Bool) -> LineParser String
-satisfy func = tokenPrim
-               (\s -> show s)
-               (\pos _ _ -> incSourceLine pos 1)
-               (\s -> if func s then Just s else Nothing)
+satisfy func = tokenPrim show next test
+  where
+    next pos _ _ = incSourceLine pos 1
+    test s
+     | func s    = Just s
+     | otherwise = Nothing
 
 firstChar :: (Char -> Bool) -> LineParser String
 firstChar func = satisfy $ test func
@@ -39,6 +44,9 @@ firstChar func = satisfy $ test func
 
 firstCharIs :: Char -> LineParser String
 firstCharIs c = firstChar (== c)
+
+firstCharIs' :: Char -> LineParser String
+firstCharIs' c = tail <$> firstCharIs c
 
 firstCharIsNot :: Char -> LineParser String
 firstCharIsNot c = firstChar (/= c)
@@ -52,9 +60,7 @@ prefixIsNot str = satisfy (not . isPrefixOf str)
 ----------------------------------------------------------------
 
 lexeme :: LineParser a -> LineParser a
-lexeme p = do x <- p
-              clean
-              return x
+lexeme p = p <* clean
 
 clean :: LineParser ()
 clean = skipMany (blank <|> comment)

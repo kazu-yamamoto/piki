@@ -7,7 +7,6 @@ import Notation
 import LineParser
 import HtmlText
 import Html
-import ApplicativeParsec
 
 ----------------------------------------------------------------
 
@@ -83,10 +82,7 @@ xlist :: Int -> LineParser Xlist
 xlist n = ulist n <|> olist n <|> return Nil
 
 item :: Char -> Int -> LineParser String
-item c n = do
-    l <- prefixIs (replicate n c)
-    let itm = drop n l
-    fromText itm
+item c n = drop n <$> prefixIs (replicate n c) >>= fromText
 
 ----------------------------------------------------------------
 
@@ -94,20 +90,17 @@ dlist :: LineParser Element
 dlist = DL <$> many1 ditem
 
 ditem :: LineParser Def
-ditem = do
-    (_:ts) <- firstCharIs pikiDlT
-    title  <- fromText ts
-    (_:ds) <- firstCharIs pikiDlD <?> ": no \"!\""
-    desc   <- fromText ds
-    return $ Def title desc
+ditem = Def <$> title <*> desc
+  where
+    title = firstCharIs' pikiDlT >>= fromText
+    desc  = (firstCharIs' pikiDlD <?> ": no \"!\"") >>= fromText
 
 ----------------------------------------------------------------
 
 image :: LineParser Element
-image = do
-    (_:line) <- firstCharIs pikiImg
-    images <- getTitleFiles line
-    return $ IMG images
+image = IMG <$> img
+  where
+    img = firstCharIs' pikiImg >>= getTitleFiles
 
 ----------------------------------------------------------------
 
@@ -117,15 +110,15 @@ preformatted = do
     ls <- many $ prefixIsNot pikiPreClose
     prefixIs pikiPreClose <?> ": no \"" ++ pikiPreClose ++ "\""
     let pre = toPre ls
-    return $ PRE pre
+    return pre
   where
-    toPre = reference . unlines
+    toPre = PRE . reference . unlines
 
 ----------------------------------------------------------------
 
 division :: LineParser Element
 division = do
-    (_:value) <- firstCharIs pikiDivOpen
+    value <- firstCharIs' pikiDivOpen
     elts <- many element
     firstCharIs pikiDivClose <?> ": no \"" ++ [pikiDivClose] ++ "\""
     let attr = getAttr value
@@ -140,12 +133,9 @@ division = do
 ----------------------------------------------------------------
 
 paragraph :: LineParser Element
-paragraph = do
-    ls <- many1 paragLine
-    let p = toP ls
-    return $ P p
+paragraph = toP <$> many1 paragLine
   where
-    toP = concat . intersperse "\n"
+    toP = P . concat . intersperse "\n"
 
 paragLine :: LineParser String
 paragLine = firstChar (`notElem` pikiReserved) >>= fromText

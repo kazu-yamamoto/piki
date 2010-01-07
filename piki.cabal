@@ -27,12 +27,12 @@ Executable piki
     Main-Is:            Main.hs
     GHC-Options:        -Wall
     Build-Depends:      base >= 2.0 && < 4,
-                        parsec >= 2.0.0.0,
-                        utf8-string >= 0.3
+                        parsec >= 3,
+                        utf8-string >= 0.3,
+                        mtl > 1
     Other-Modules:      Html,
                         HtmlText,
                         LineParser,
                         Notation,
                         Piki,
-                        Tag,
-                        ApplicativeParsec
+                        Tag
