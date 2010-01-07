@@ -42,8 +42,8 @@ instance Show Xlist where
 instance Show Xitem where
     show (Item str Nil) = str // "li"
     show (Item str xls) = (str ++ "\n" ++ (indent $ show xls)) // "li"
-        where
-          indent = unlines . map idn . lines
-          idn xs@('<':_)  = '\t':xs
-          idn xs@('\t':_) = '\t':xs
-          idn xs          = xs
+      where
+        indent = unlines . map idn . lines
+        idn xs@('<':_)  = '\t':xs
+        idn xs@('\t':_) = '\t':xs
+        idn xs          = xs

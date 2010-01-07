@@ -10,37 +10,37 @@ import Piki
 ----------------------------------------------------------------
 
 version :: String
-version = "0.2"
+version = "0.3"
 
 printVersion :: IO ()
-printVersion = do prog <- getProgName
-                  putStrLn $ prog ++ " version " ++ version
+printVersion = putStrLn . (++ " version " ++ version) =<< getProgName
 
 printUsage :: IO ()
-printUsage   = do prog <- getProgName
-                  putStrLn $ prog ++ " template [file]"
+printUsage  = putStrLn . (++ " template [file]") =<< getProgName
+                  
 
 ----------------------------------------------------------------
 
 main :: IO ()
-main = do args <- getArgs
-          let opts = filter ("-" `isPrefixOf`) args
-              files = filter (not.isPrefixOf "-") args
-          case opts of
-            []        -> doPikiWith files
-            ["-v"]    -> printVersion
-            _         -> printUsage
+main = do
+    args <- getArgs
+    let opts = filter ("-" `isPrefixOf`) args
+        files = filter (not.isPrefixOf "-") args
+    case opts of
+      []        -> doPikiWith files
+      ["-v"]    -> printVersion
+      _         -> printUsage
 
 doPikiWith :: [FilePath] -> IO ()
 doPikiWith [template,input] = do
-        tmp <- U8.readFile template
-        inp <- U8.readFile input
-        U8.putStr $ doPiki tmp inp
+    tmp <- U8.readFile template
+    inp <- U8.readFile input
+    U8.putStr $ doPiki tmp inp
 
 doPikiWith [template] = do
-        tmp <- U8.readFile template
-        inp <- U8.getContents
-        U8.putStr $ doPiki tmp inp
+    tmp <- U8.readFile template
+    inp <- U8.getContents
+    U8.putStr $ doPiki tmp inp
 
 doPikiWith _ = printUsage
 

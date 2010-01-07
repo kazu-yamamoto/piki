@@ -1,8 +1,7 @@
 module LineParser (LineParser, reportError, satisfy, 
                    firstChar, firstCharIs, firstCharIsNot,
                    prefixIs, prefixIsNot,
-                   lexeme, clean,
-                   module Text.ParserCombinators.Parsec) where
+                   lexeme, clean) where
 
 import Text.ParserCombinators.Parsec hiding (satisfy)
 import Text.ParserCombinators.Parsec.Error

@@ -34,4 +34,5 @@ Executable piki
                         LineParser,
                         Notation,
                         Piki,
-                        Tag
+                        Tag,
+                        ApplicativeParsec
