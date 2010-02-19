@@ -17,7 +17,6 @@ printVersion = putStrLn . (++ " version " ++ version) =<< getProgName
 
 printUsage :: IO ()
 printUsage  = putStrLn . (++ " template [file]") =<< getProgName
-                  
 
 ----------------------------------------------------------------
 

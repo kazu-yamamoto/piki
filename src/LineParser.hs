@@ -1,4 +1,4 @@
-module LineParser (Parser, LineParser, reportError, satisfy, 
+module LineParser (Parser, LineParser, reportError, satisfy,
                    firstChar, firstCharIs, firstCharIs', firstCharIsNot,
                    prefixIs, prefixIsNot,
                    lexeme, clean,

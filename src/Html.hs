@@ -2,12 +2,12 @@ module Html where
 
 import Tag
 
-data Element = HR | 
+data Element = HR |
                H Int String |
                P String |
                PRE String |
-               UOL Xlist | 
-               DL [Def] | 
+               UOL Xlist |
+               DL [Def] |
                IMG [Image] |
                DIV DivAttr [Element]
 

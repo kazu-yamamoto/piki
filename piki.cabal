@@ -6,12 +6,12 @@ License:                BSD3
 Homepage:               http://www.mew.org/~kazu/proj/piki/
 Synopsis:               Yet another Wiki format converter
 Description:            "piki" is a script to convert a WIKI text file
-                        to an HTML file. Unlike other WIKI systems, 
-                        "piki" is not executed through a web server. 
+                        to an HTML file. Unlike other WIKI systems,
+                        "piki" is not executed through a web server.
                         You can use "piki" in the shell command line.
 Category:               Web
 Cabal-Version:          >= 1.2
-Build-Type:             Simple 
+Build-Type:             Simple
 Data-Files:             doc/en/Makefile,
                         doc/en/default.css,
                         doc/en/index.html,
