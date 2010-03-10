@@ -10,7 +10,7 @@ import Piki
 ----------------------------------------------------------------
 
 version :: String
-version = "0.3"
+version = "0.3.0"
 
 printVersion :: IO ()
 printVersion = putStrLn . (++ " version " ++ version) =<< getProgName
