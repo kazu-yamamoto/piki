@@ -3,6 +3,7 @@ Version:                0.3.0
 Author:                 Kazu Yamamoto <kazu@Mew.org>
 Maintainer:             Kazu Yamamoto <kazu@Mew.org>
 License:                BSD3
+License-File:           LICENSE
 Homepage:               http://www.mew.org/~kazu/proj/piki/
 Synopsis:               Yet another Wiki format converter
 Description:            "piki" is a script to convert a WIKI text file
