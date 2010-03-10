@@ -1,13 +1,14 @@
 * Piki -- コマンドライン WIKI
 
+[English ../en/]
 {right
 山本和彦\<br /\>
-2009.4.6\<br /\>
+2010.3.10\<br /\>
 }
 
 Piki は、WIKI の一種です。他の WIKI と同様、Piki は文章の構造を表現するための簡潔な記法を提供します。しかし他の WIKI と違って、Web サーバーを使いません。"piki" は、Piki ファイルを HTML ファイルに変換するためのコマンドライン・プログラムです。
 
-"piki" は、[Haskell http://www.haskell.org] の関数型パーサーである [Parsec http://legacy.cs.uu.nl/daan/download/parsec/parsec.html] で書かれています。現在、Piki version 0.3 が[hackageDB http://hackage.haskell.org/packages/archive/pkg-list.html]で公開されています。
+"piki" は、[Haskell http://www.haskell.org] の関数型パーサーである [Parsec http://legacy.cs.uu.nl/daan/download/parsec/parsec.html] で書かれています。現在、["Piki version 0.3.0" http://hackage.haskell.org/package/piki] を Hackage で公開しています。["Git リポジトリー" http://github.com/kazu-yamamoto/piki]は、github にあります。
 
 ** "piki" コマンド
 
@@ -158,7 +159,7 @@ multiple lines.
 
 >|
 .right {
-	text-align: right;
-	padding-right: 16px;
+        text-align: right;
+        padding-right: 16px;
 }
 |<

@@ -12,12 +12,13 @@
 <div id="main">
 
 <h1>Piki -- コマンドライン WIKI</h1>
+<p><a href="../en/">English</a></p>
 <div class="right">
 <p>山本和彦<br />
-2009.4.6<br /></p>
+2010.3.10<br /></p>
 </div>
 <p>Piki は、WIKI の一種です。他の WIKI と同様、Piki は文章の構造を表現するための簡潔な記法を提供します。しかし他の WIKI と違って、Web サーバーを使いません。&quot;piki&quot; は、Piki ファイルを HTML ファイルに変換するためのコマンドライン・プログラムです。</p>
-<p>&quot;piki&quot; は、<a href="http://www.haskell.org">Haskell</a> の関数型パーサーである <a href="http://legacy.cs.uu.nl/daan/download/parsec/parsec.html">Parsec</a> で書かれています。現在、Piki version 0.3 が<a href="http://hackage.haskell.org/packages/archive/pkg-list.html">hackageDB</a>で公開されています。</p>
+<p>&quot;piki&quot; は、<a href="http://www.haskell.org">Haskell</a> の関数型パーサーである <a href="http://legacy.cs.uu.nl/daan/download/parsec/parsec.html">Parsec</a> で書かれています。現在、<a href="http://hackage.haskell.org/package/piki">Piki version 0.3.0</a> を Hackage で公開しています。<a href="http://github.com/kazu-yamamoto/piki">Git リポジトリー</a>は、github にあります。</p>
 <h2>&quot;piki&quot; コマンド</h2>
 <p>&quot;piki&quot; は、HTML 雛形ファイル(&quot;template.html&quot;とする) と Piki 記法で書かれたファイル(&quot;index.piki&quot;とする)をコマンドライン引数に取り、HTML ファイル(&quot;index.html&quot; とする)を出力します。</p>
 <pre>
@@ -122,8 +123,8 @@ multiple lines.
 </pre>
 <pre>
 .right {
-	text-align: right;
-	padding-right: 16px;
+        text-align: right;
+        padding-right: 16px;
 }
 </pre>
 

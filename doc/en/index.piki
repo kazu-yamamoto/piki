@@ -1,8 +1,9 @@
 * Piki -- a command line WIKI
 
+[Japanese ../ja/]
 {right
 Kazu Yamamoto\<br /\>
-2009.4.6\<br /\>
+2010.3.10\<br /\>
 }
 
 Piki is yet another WIKI. Like other WIKI systems, Piki provides
@@ -14,7 +15,8 @@ an HTML file.
 "piki" is written in 
 [Parsec http://legacy.cs.uu.nl/daan/download/parsec/parsec.html], 
 a functional parser of [Haskell http://www.haskell.org].
-You can download Piki version 0.3 from [hackageDB http://hackage.haskell.org/packages/archive/pkg-list.html].
+You can download ["Piki version 0.3.0" http://hackage.haskell.org/package/piki] from Hackage.
+["Git repository" http://github.com/kazu-yamamoto/piki] is on github.
 
 ** The "piki" command
 
@@ -189,7 +191,7 @@ Kazu Yamamoto\<br /\>
 
 >|
 .right {
-	text-align: right;
-	padding-right: 16px;
+        text-align: right;
+        padding-right: 16px;
 }
 |<

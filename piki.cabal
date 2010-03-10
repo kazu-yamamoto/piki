@@ -24,13 +24,13 @@ Data-Files:             doc/en/Makefile
                         doc/ja/index.piki
                         doc/ja/template.html
 Executable piki
-    HS-Source-Dirs:     src
-    Main-Is:            Main.hs
-    GHC-Options:        -Wall
-    Build-Depends:      base >= 4.0 && < 10,
+  HS-Source-Dirs:       src
+  Main-Is:              Main.hs
+  GHC-Options:          -Wall
+  Build-Depends:        base >= 4.0 && < 10,
                         parsec >= 3,
                         utf8-string, mtl
-    Other-Modules:      Html HtmlText LineParser Notation Piki Tag
+  Other-Modules:        Html HtmlText LineParser Notation Piki Tag
 Source-Repository head
   Type:                 git
   Location:             git://github.com/kazu-yamamoto/piki.git
