@@ -22,6 +22,8 @@ printUsage  = putStrLn . (++ " template [file]") =<< getProgName
 
 main :: IO ()
 main = do
+    hSetEncoding stdin utf8
+    hSetEncoding stdout utf8
     args <- getArgs
     let opts = filter ("-" `isPrefixOf`) args
         files = filter (not.isPrefixOf "-") args
@@ -44,7 +46,6 @@ doPikiWith [template,input] = do
 
 doPikiWith [template] = do
     tmp <- readFileU8 template
-    hSetEncoding stdin utf8
     inp <- getContents
     putStr $ doPiki tmp inp
 
