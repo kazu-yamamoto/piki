@@ -26,7 +26,7 @@ Data-Files:             doc/en/Makefile
 Executable piki
   HS-Source-Dirs:       src
   Main-Is:              Main.hs
-  GHC-Options:          -Wall
+  GHC-Options:          -Wall -fno-warn-unused-do-bind
   Build-Depends:        base >= 4.0 && < 10,
                         parsec >= 3,
                         utf8-string, mtl

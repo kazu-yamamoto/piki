@@ -4,7 +4,7 @@ import Data.Char
 import Data.List
 import Data.Maybe
 import System.Environment
-import qualified System.IO.UTF8 as U8
+import System.IO
 import Piki
 
 ----------------------------------------------------------------
@@ -30,16 +30,23 @@ main = do
       ["-v"]    -> printVersion
       _         -> printUsage
 
+readFileU8 :: FilePath -> IO String
+readFileU8 file = do
+    h <- openFile file ReadMode
+    hSetEncoding h utf8
+    hGetContents h
+
 doPikiWith :: [FilePath] -> IO ()
 doPikiWith [template,input] = do
-    tmp <- U8.readFile template
-    inp <- U8.readFile input
-    U8.putStr $ doPiki tmp inp
+    tmp <- readFileU8 template
+    inp <- readFileU8 input
+    putStr $ doPiki tmp inp
 
 doPikiWith [template] = do
-    tmp <- U8.readFile template
-    inp <- U8.getContents
-    U8.putStr $ doPiki tmp inp
+    tmp <- readFileU8 template
+    hSetEncoding stdin utf8
+    inp <- getContents
+    putStr $ doPiki tmp inp
 
 doPikiWith _ = printUsage
 

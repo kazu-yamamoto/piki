@@ -1,6 +1,6 @@
 module HtmlText (fromText, getTitleFiles, reference) where
 
-import Data.Char
+--import Data.Char
 import Notation
 import Html
 import Tag
