@@ -24,7 +24,7 @@ printUsage  = putStrLn . (++ " template [file]") =<< getProgName
 
 main :: IO ()
 main = do
-#if __GLASGOW_HASKELL__ == 612
+#if __GLASGOW_HASKELL__ >= 611
     hSetEncoding stdin utf8
     hSetEncoding stdout utf8
 #endif
@@ -39,7 +39,7 @@ main = do
 readFileU8 :: FilePath -> IO String
 readFileU8 file = do
     h <- openFile file ReadMode
-#if __GLASGOW_HASKELL__ == 612
+#if __GLASGOW_HASKELL__ >= 611
     hSetEncoding h utf8
 #endif
     hGetContents h
