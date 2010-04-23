@@ -26,7 +26,7 @@ link = do char pikiAOpen
           space
           url <- word
           char pikiAClose
-          return $ (reference title) ### ("a",[("href",url)])
+          return $ reference title %%% ("a",[("href",url)])
 
 shrinkSpaces :: Parser String
 shrinkSpaces = do many1 space
@@ -66,8 +66,7 @@ getTitleFiles str = case parse titleFiles "getTitleFiles" str of
 
 titleFiles :: Parser [Image]
 titleFiles = do spaces
-                tfs <- sepBy1 titleFile spaces
-                return tfs
+                sepBy1 titleFile spaces
 
 titleFile :: Parser Image
 titleFile = do title <- word

@@ -124,10 +124,9 @@ division = do
     let attr = getAttr value
     return $ DIV attr elts
   where
-    getAttr value = if anyUpperChar value
-                    then (Id $ toLowerWord value)
+    getAttr value = if any isUpper value
+                    then Id $ toLowerWord value
                     else Class value
-    anyUpperChar = or . map isUpper
     toLowerWord = map toLower
 
 ----------------------------------------------------------------

@@ -19,7 +19,7 @@ data DivAttr = Class String | Id String
 
 instance Show Element where
     show HR        = solo ("hr",[])
-    show (H n str) = str // ("h" ++ show lvl) where lvl = min 6 n
+    show (H n str) = str // ('h' : show lvl) where lvl = min 6 n
     show (P str)   = str // "p"
     show (PRE str) = str \\ "pre"
     show (UOL xl)  = show xl
@@ -41,7 +41,7 @@ instance Show Xlist where
 
 instance Show Xitem where
     show (Item str Nil) = str // "li"
-    show (Item str xls) = (str ++ "\n" ++ (indent $ show xls)) // "li"
+    show (Item str xls) = (str ++ "\n" ++ indent (show xls)) // "li"
       where
         indent = unlines . map idn . lines
         idn xs@('<':_)  = '\t':xs

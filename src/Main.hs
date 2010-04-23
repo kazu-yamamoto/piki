@@ -67,7 +67,7 @@ doPiki tmp inp = let (ttl,body) = piki inp
 replace :: String -> [(String, String)] -> String
 replace tmpl params =
         case break (== '$') tmpl of
-          (s, ('$':cs)) -> s ++ replaced ++ replace (chop rest) params
+          (s, '$':cs) -> s ++ replaced ++ replace (chop rest) params
               where
                 (var, rest) = span isAlpha cs
                 replaced = fromMaybe ('$':var) (lookup var params)
