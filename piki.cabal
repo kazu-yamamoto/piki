@@ -1,5 +1,5 @@
 Name:                   piki
-Version:                0.3.0
+Version:                0.3.1
 Author:                 Kazu Yamamoto <kazu@iij.ad.jp>
 Maintainer:             Kazu Yamamoto <kazu@iij.ad.jp>
 License:                BSD3
@@ -31,9 +31,8 @@ Executable piki
   else
     GHC-Options:        -Wall -O2
   Build-Depends:        base >= 4.0 && < 5,
-                        parsec >= 3,
-                        utf8-string, mtl
-  Other-Modules:        Html HtmlText LineParser Notation Piki Tag
+                        parsec, utf8-string, mtl
+  Other-Modules:        Html HtmlText LineParser Notation Piki Tag Parsec
 Source-Repository head
   Type:                 git
   Location:             git://github.com/kazu-yamamoto/piki.git

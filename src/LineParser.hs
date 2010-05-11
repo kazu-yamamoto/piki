@@ -1,16 +1,13 @@
-module LineParser (Parser, LineParser, reportError, satisfy,
+module LineParser (LineParser, reportError, satisfy,
                    firstChar, firstCharIs, firstCharIs', firstCharIsNot,
                    prefixIs, prefixIsNot,
                    lexeme, clean,
-                   module Text.Parsec, module Control.Applicative) where
+                   module Parsec) where
 
-import Control.Applicative ((<$>),(<$),(<*),(<*>),(*>))
 import Data.Char
 import Data.List
 import Notation
-import Text.Parsec hiding (satisfy)
-import Text.Parsec.Error
-import Text.Parsec.String
+import Parsec
 
 ----------------------------------------------------------------
 
