@@ -1,9 +1,7 @@
 module Piki (piki) where
 
-import Control.Monad
 import Data.Char
 import Data.List (intersperse)
-import Html
 import HtmlText
 import LineParser
 import Notation
@@ -11,19 +9,15 @@ import Types
 
 ----------------------------------------------------------------
 
-piki :: String -> (String,Maybe String)
+piki :: String -> [Element]
 piki line = either reportError id res
   where
-    res = runParser document Nothing "" $ lines line
+    res = parse document "" $ lines line
 
 ----------------------------------------------------------------
 
-document :: LineParser (String,Maybe String)
-document = (,) <$> html <*> title
-  where
-    html = clean *> (showElements <$> many element) <* eof
-    showElements = concatMap toHtml
-    title = getState
+document :: LineParser [Element]
+document = clean *> many element <* eof
 
 ----------------------------------------------------------------
 
@@ -45,18 +39,12 @@ headline :: LineParser Element
 headline = do
     (lvl,txt) <- levelTitle <$> firstCharIs pikiTitle
     ttl <- fromText txt
-    setTitle lvl ttl
     return $ H lvl ttl
   where
     levelTitle line = (lvl, ttl)
       where
         (mark, ttl) = span (== pikiTitle) line
         lvl = length mark
-    setTitle lvl ttl = when (lvl == 1) $ getState >>= setTitleIfNothing
-      where
-        setTitleIfNothing = maybe (setTtl ttl) doNothing
-        setTtl = setState . Just
-        doNothing _ = return ()
 
 ----------------------------------------------------------------
 

@@ -8,6 +8,8 @@ import Data.Maybe
 import System.Environment
 import System.IO
 import Piki
+import Html
+import Types
 
 ----------------------------------------------------------------
 
@@ -60,8 +62,9 @@ doPikiWith _ = printUsage
 ----------------------------------------------------------------
 
 doPiki :: String -> String -> String
-doPiki tmp inp = let (body,ttl) = piki inp
-                     title = fromMaybe "" ttl
+doPiki tmp inp = let elems = piki inp
+                     body = concatMap toHtml elems
+                     title = getTitle elems
                  in replace tmp [("body",body),("title",title)]
 
 replace :: String -> [(String, String)] -> String

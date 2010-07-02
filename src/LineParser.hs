@@ -20,7 +20,7 @@ import Parsec
 
 ----------------------------------------------------------------
 
-type LineParser a = GenParser String (Maybe String) a
+type LineParser a = GenParser String () a
 
 reportError :: ParseError -> a
 reportError err = error $ "error in line "
