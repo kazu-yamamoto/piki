@@ -4,11 +4,10 @@ module HtmlText (
   , reference
   ) where
 
---import Data.Char
-import Notation
-import Html
-import Tag
 import LineParser
+import Notation
+import Tag
+import Types
 
 ----------------------------------------------------------------
 

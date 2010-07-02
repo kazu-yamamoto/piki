@@ -1,12 +1,13 @@
 module Piki (piki) where
 
+import Control.Monad
 import Data.Char
 import Data.List (intersperse)
-import Control.Monad
-import Notation
-import LineParser
-import HtmlText
 import Html
+import HtmlText
+import LineParser
+import Notation
+import Types
 
 ----------------------------------------------------------------
 
@@ -21,7 +22,7 @@ document :: LineParser (String,Maybe String)
 document = (,) <$> html <*> title
   where
     html = clean *> (showElements <$> many element) <* eof
-    showElements = concatMap show
+    showElements = concatMap toHtml
     title = getState
 
 ----------------------------------------------------------------
@@ -109,12 +110,11 @@ image = IMG <$> img
 ----------------------------------------------------------------
 
 preformatted :: LineParser Element
-preformatted = toPre <$> (open *> pre <* close)
+preformatted = PRE <$> (open *> pre <* close)
   where
     open  = prefixIs pikiPreOpen
-    pre   = many (prefixIsNot pikiPreClose)
+    pre   = reference . unlines <$> many (prefixIsNot pikiPreClose)
     close = prefixIs pikiPreClose <?> ": no \"" ++ pikiPreClose ++ "\""
-    toPre = PRE . reference . unlines
 
 ----------------------------------------------------------------
 
@@ -132,9 +132,9 @@ division = DIV <$> attr <*> elts <* close
 ----------------------------------------------------------------
 
 paragraph :: LineParser Element
-paragraph = toP <$> many1 paragLine
+paragraph = P <$> parag
   where
-    toP = P . concat . intersperse "\n"
+    parag = concat . intersperse "\n" <$> many1 paragLine
 
 paragLine :: LineParser String
 paragLine = firstChar (`notElem` pikiReserved) >>= fromText

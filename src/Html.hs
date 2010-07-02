@@ -1,47 +1,36 @@
 module Html where
 
 import Tag
+import Types
 
-data Element = HR
-             | H Int String
-             | P String
-             | PRE String
-             | UOL Xlist
-             | DL [Def]
-             | IMG [Image]
-             | DIV DivAttr [Element]
+class ToHtml a where
+    toHtml :: a -> String
 
-data Xlist   = Ulist [Xitem] | Olist [Xitem] | Nil
-data Xitem   = Item String Xlist
-data Def     = Def String String
-data Image   = Image String String
-data DivAttr = Class String | Id String
+instance ToHtml Element where
+    toHtml HR        = solo ("hr",[])
+    toHtml (H n str) = str // ('h' : show lvl) where lvl = min 6 n
+    toHtml (P str)   = str // "p"
+    toHtml (PRE str) = str \\ "pre"
+    toHtml (UOL xl)  = toHtml xl
+    toHtml (DL ds)   = concatMap toHtml ds \\ "dl"
+    toHtml (IMG is)  = concatMap toHtml is
+    toHtml (DIV (Class val) els) = concatMap toHtml els \\\ ("div",[("class",val)])
+    toHtml (DIV (Id val) els)    = concatMap toHtml els \\\ ("div",[("id",val)])
 
-instance Show Element where
-    show HR        = solo ("hr",[])
-    show (H n str) = str // ('h' : show lvl) where lvl = min 6 n
-    show (P str)   = str // "p"
-    show (PRE str) = str \\ "pre"
-    show (UOL xl)  = show xl
-    show (DL ds)   = concatMap show ds \\ "dl"
-    show (IMG is)  = concatMap show is
-    show (DIV (Class val) els) = concatMap show els \\\ ("div",[("class",val)])
-    show (DIV (Id val) els)    = concatMap show els \\\ ("div",[("id",val)])
+instance ToHtml Def where
+    toHtml (Def title desc) = title // "dt" ++ desc // "dd"
 
-instance Show Def where
-    show (Def title desc) = title // "dt" ++ desc // "dd"
+instance ToHtml Image where
+    toHtml (Image title src) = solo ("img",[("src",src),("alt",title),("title",title)])
 
-instance Show Image where
-    show (Image title src) = solo ("img",[("src",src),("alt",title),("title",title)])
+instance ToHtml Xlist where
+    toHtml (Ulist xls) = concatMap toHtml xls \\ "ul"
+    toHtml (Olist xls) = concatMap toHtml xls \\ "ol"
+    toHtml Nil         = ""
 
-instance Show Xlist where
-    show (Ulist xls) = concatMap show xls \\ "ul"
-    show (Olist xls) = concatMap show xls \\ "ol"
-    show Nil         = ""
-
-instance Show Xitem where
-    show (Item str Nil) = str // "li"
-    show (Item str xls) = (str ++ "\n" ++ indent (show xls)) // "li"
+instance ToHtml Xitem where
+    toHtml (Item str Nil) = str // "li"
+    toHtml (Item str xls) = (str ++ "\n" ++ indent (toHtml xls)) // "li"
       where
         indent = unlines . map idn . lines
         idn xs@('<':_)  = '\t':xs
