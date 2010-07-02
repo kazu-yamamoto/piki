@@ -1,4 +1,8 @@
-module HtmlText (fromText, getTitleFiles, reference) where
+module HtmlText (
+    fromText
+  , getTitleFiles
+  , reference
+  ) where
 
 --import Data.Char
 import Notation
@@ -16,27 +20,32 @@ fromText str = case parse text "fromText" str of
 ----------------------------------------------------------------
 
 text :: Parser String
-text = do spaces
-          ss <- many (link <|> shrinkSpaces <|> rawtext)
-          return $ concat ss
+text = concat <$> (spaces *> contents)
+  where
+    contents = many (link <|> shrinkSpaces <|> rawtext)
 
 link :: Parser String
-link = do char pikiAOpen
-          title <- word
-          space
-          url <- word
-          char pikiAClose
-          return $ reference title %%% ("a",[("href",url)])
+link = do
+    char pikiAOpen
+    title <- word
+    space
+    url <- word
+    char pikiAClose
+    return $ reference title %%% ("a",[("href",url)])
 
 shrinkSpaces :: Parser String
-shrinkSpaces = do many1 space
-                  try (do eof; return "") <|> return " "
+shrinkSpaces = do
+    many1 space
+    try (do eof; return "") <|> return " "
 
 rawtext :: Parser String
-rawtext = do c  <- anyChar
-             if c == pikiEscape
-               then do c' <- anyChar; return [c']
-               else return $ referenceChar c
+rawtext = do
+    c <- anyChar
+    if c == pikiEscape
+        then singleton <$> anyChar
+        else return $ referenceChar c
+  where
+    singleton c = [c]
 
 ----------------------------------------------------------------
 
@@ -44,20 +53,16 @@ word :: Parser String
 word = quoted <|> unquoted
 
 quoted :: Parser String
-quoted = do char '"'
-            str <- many1 $ noneOf "\t\n[]\""
-            char '"'
-            return str
+quoted = open *> inside <* close
+  where
+    open   = char '"'
+    inside = many1 $ noneOf "\t\n[]\""
+    close  = char '"'
 
 unquoted :: Parser String
 unquoted = many1 $ noneOf " \t\n[]\""
 
 ----------------------------------------------------------------
-
-{-
-getTitleFiles :: String -> Either ParseError [Image]
-getTitleFiles = parse titleFiles "getTitleFiles"
--}
 
 getTitleFiles :: String -> LineParser [Image]
 getTitleFiles str = case parse titleFiles "getTitleFiles" str of
@@ -65,14 +70,10 @@ getTitleFiles str = case parse titleFiles "getTitleFiles" str of
                       Left  _    -> fail ": no '@ title file'"
 
 titleFiles :: Parser [Image]
-titleFiles = do spaces
-                sepBy1 titleFile spaces
+titleFiles = spaces *> sepBy1 titleFile spaces
 
 titleFile :: Parser Image
-titleFile = do title <- word
-               spaces
-               file <- word
-               return $ Image (reference title) file
+titleFile = Image <$> (reference <$> word) <*> (spaces *> word)
 
 ----------------------------------------------------------------
 

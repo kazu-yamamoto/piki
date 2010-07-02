@@ -10,48 +10,52 @@ import Html
 
 ----------------------------------------------------------------
 
-piki :: String -> (Maybe String,String)
-piki line = case runParser document Nothing "" (lines line) of
-              Right (title,html) -> (title,html)
-              Left  err  -> reportError err
+piki :: String -> (String,Maybe String)
+piki line = either reportError id res
+  where
+    res = runParser document Nothing "" $ lines line
 
 ----------------------------------------------------------------
 
-document :: LineParser (Maybe String,String)
-document = do
-    clean
-    elts <- many element
-    eof
-    title <- getState
-    let html = showElements elts
-    return (title,html)
+document :: LineParser (String,Maybe String)
+document = (,) <$> html <*> title
   where
+    html = clean *> (showElements <$> many element) <* eof
     showElements = concatMap show
+    title = getState
 
 ----------------------------------------------------------------
 
 element :: LineParser Element
-element = choice $ map lexeme [division, headline, hrule, uolist, dlist,
-                               image, preformatted, paragraph]
+element = choice $ map lexeme [
+    division
+  , headline
+  , hrule
+  , uolist
+  , dlist
+  , image
+  , preformatted
+  , paragraph
+  ]
 
 ----------------------------------------------------------------
 
 headline :: LineParser Element
 headline = do
-    line <- firstCharIs pikiTitle
-    let (lvl,txt) = levelTitle line
+    (lvl,txt) <- levelTitle <$> firstCharIs pikiTitle
     ttl <- fromText txt
     setTitle lvl ttl
     return $ H lvl ttl
   where
-    levelTitle line = let (mark, ttl) = span (== pikiTitle) line
-                          lvl = length mark
-                      in (lvl, ttl)
-    setTitle lvl ttl = when (lvl == 1) $ do
-                         title <- getState
-                         case title of
-                           Nothing -> setState (Just ttl)
-                           Just _  -> return ()
+    levelTitle line = (lvl, ttl)
+      where
+        (mark, ttl) = span (== pikiTitle) line
+        lvl = length mark
+    setTitle lvl ttl = when (lvl == 1) $ getState >>= setTitleIfNothing
+      where
+        setTitleIfNothing = maybe (setTtl ttl) doNothing
+        setTtl = setState . Just
+        doNothing _ = return ()
 
 ----------------------------------------------------------------
 
@@ -105,28 +109,24 @@ image = IMG <$> img
 ----------------------------------------------------------------
 
 preformatted :: LineParser Element
-preformatted = do
-    prefixIs pikiPreOpen
-    ls <- many $ prefixIsNot pikiPreClose
-    prefixIs pikiPreClose <?> ": no \"" ++ pikiPreClose ++ "\""
-    let pre = toPre ls
-    return pre
+preformatted = toPre <$> (open *> pre <* close)
   where
+    open  = prefixIs pikiPreOpen
+    pre   = many (prefixIsNot pikiPreClose)
+    close = prefixIs pikiPreClose <?> ": no \"" ++ pikiPreClose ++ "\""
     toPre = PRE . reference . unlines
 
 ----------------------------------------------------------------
 
 division :: LineParser Element
-division = do
-    value <- firstCharIs' pikiDivOpen
-    elts <- many element
-    firstCharIs pikiDivClose <?> ": no \"" ++ [pikiDivClose] ++ "\""
-    let attr = getAttr value
-    return $ DIV attr elts
+division = DIV <$> attr <*> elts <* close
   where
-    getAttr value = if any isUpper value
-                    then Id $ toLowerWord value
-                    else Class value
+    attr = getAttr <$> firstCharIs' pikiDivOpen
+    elts = many element
+    close = firstCharIs pikiDivClose <?> ": no \"" ++ [pikiDivClose] ++ "\""
+    getAttr value
+      | any isUpper value = Id $ toLowerWord value
+      | otherwise         = Class value
     toLowerWord = map toLower
 
 ----------------------------------------------------------------

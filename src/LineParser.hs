@@ -1,8 +1,17 @@
-module LineParser (LineParser, reportError, satisfy,
-                   firstChar, firstCharIs, firstCharIs', firstCharIsNot,
-                   prefixIs, prefixIsNot,
-                   lexeme, clean,
-                   module Parsec) where
+module LineParser (
+    LineParser
+  , reportError
+  , satisfy
+  , firstChar
+  , firstCharIs
+  , firstCharIs'
+  , firstCharIsNot
+  , prefixIs
+  , prefixIsNot
+  , lexeme
+  , clean
+  , module Parsec
+  ) where
 
 import Data.Char
 import Data.List

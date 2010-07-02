@@ -60,7 +60,7 @@ doPikiWith _ = printUsage
 ----------------------------------------------------------------
 
 doPiki :: String -> String -> String
-doPiki tmp inp = let (ttl,body) = piki inp
+doPiki tmp inp = let (body,ttl) = piki inp
                      title = fromMaybe "" ttl
                  in replace tmp [("body",body),("title",title)]
 
