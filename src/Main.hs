@@ -10,7 +10,7 @@ import Html
 ----------------------------------------------------------------
 
 version :: String
-version = "0.3.1"
+version = "0.4.0"
 
 printVersion :: IO ()
 printVersion = putStrLn . (++ " version " ++ version) =<< getProgName
