@@ -2,8 +2,8 @@ module Piki (piki) where
 
 import Data.Char
 import Data.List (intersperse)
-import HtmlText
 import LineParser
+import CharParser
 import Notation
 import Types
 
@@ -38,12 +38,12 @@ element = choice $ map lexeme [
 headline :: LineParser Element
 headline = do
     (lvl,txt) <- levelTitle <$> firstCharIs pikiTitle
-    ttl <- fromText txt
+    ttl <- getText txt
     return $ H lvl ttl
   where
-    levelTitle line = (lvl, ttl)
+    levelTitle line = (lvl,txt)
       where
-        (mark, ttl) = span (== pikiTitle) line
+        (mark, txt) = span (== pikiTitle) line
         lvl = length mark
 
 ----------------------------------------------------------------
@@ -74,8 +74,8 @@ xitem c n = Item <$> item c n <*> xlist (n + 1)
 xlist :: Int -> LineParser Xlist
 xlist n = ulist n <|> olist n <|> return Nil
 
-item :: Char -> Int -> LineParser String
-item c n = drop n <$> prefixIs (replicate n c) >>= fromText
+item :: Char -> Int -> LineParser XString
+item c n = (drop n <$> prefixIs (replicate n c)) >>= getText
 
 ----------------------------------------------------------------
 
@@ -85,8 +85,8 @@ dlist = DL <$> many1 ditem
 ditem :: LineParser Def
 ditem = Def <$> title <*> desc
   where
-    title = firstCharIs' pikiDlT >>= fromText
-    desc  = (firstCharIs' pikiDlD <?> ": no \"!\"") >>= fromText
+    title = firstCharIs' pikiDlT >>= getText
+    desc  = (firstCharIs' pikiDlD <?> ": no \"!\"") >>= getText
 
 ----------------------------------------------------------------
 
@@ -98,11 +98,12 @@ image = IMG <$> img
 ----------------------------------------------------------------
 
 preformatted :: LineParser Element
-preformatted = PRE <$> (open *> pre <* close)
+preformatted = PRE . toXString <$> (open *> pre <* close)
   where
     open  = prefixIs pikiPreOpen
-    pre   = reference . unlines <$> many (prefixIsNot pikiPreClose)
+    pre   = unlines <$> many (prefixIsNot pikiPreClose)
     close = prefixIs pikiPreClose <?> ": no \"" ++ pikiPreClose ++ "\""
+    toXString xs = [L xs]
 
 ----------------------------------------------------------------
 
@@ -122,9 +123,9 @@ division = DIV <$> attr <*> elts <* close
 paragraph :: LineParser Element
 paragraph = P <$> parag
   where
-    parag = concat . intersperse "\n" <$> many1 paragLine
+    parag = (concat . intersperse "\n" <$> many1 paragLine) >>= getText
 
 paragLine :: LineParser String
-paragLine = firstChar (`notElem` pikiReserved) >>= fromText
+paragLine = firstChar (`notElem` pikiReserved)
 
 ----------------------------------------------------------------

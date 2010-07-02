@@ -2,14 +2,10 @@
 
 module Main where
 
-import Data.Char
 import Data.List
-import Data.Maybe
 import System.Environment
 import System.IO
-import Piki
 import Html
-import Types
 
 ----------------------------------------------------------------
 
@@ -50,30 +46,11 @@ doPikiWith :: [FilePath] -> IO ()
 doPikiWith [template,input] = do
     tmp <- readFileU8 template
     inp <- readFileU8 input
-    putStr $ doPiki tmp inp
+    putStr $ toHTML tmp inp
 
 doPikiWith [template] = do
     tmp <- readFileU8 template
     inp <- getContents
-    putStr $ doPiki tmp inp
+    putStr $ toHTML tmp inp
 
 doPikiWith _ = printUsage
-
-----------------------------------------------------------------
-
-doPiki :: String -> String -> String
-doPiki tmp inp = let elems = piki inp
-                     body = concatMap toHtml elems
-                     title = getTitle elems
-                 in replace tmp [("body",body),("title",title)]
-
-replace :: String -> [(String, String)] -> String
-replace tmpl params =
-        case break (== '$') tmpl of
-          (s, '$':cs) -> s ++ replaced ++ replace (chop rest) params
-              where
-                (var, rest) = span isAlpha cs
-                replaced = fromMaybe ('$':var) (lookup var params)
-                chop ('\n':xs) = xs
-                chop xs        = xs
-          (s, _)     -> s
