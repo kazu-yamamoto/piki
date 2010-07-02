@@ -27,12 +27,18 @@ Executable piki
   HS-Source-Dirs:       src
   Main-Is:              Main.hs
   if impl(ghc >= 6.12)
-    GHC-Options:        -Wall -O2 -fno-warn-unused-do-bind
+    GHC-Options:        -Wall -fno-warn-unused-do-bind
   else
-    GHC-Options:        -Wall -O2
+    GHC-Options:        -Wall
   Build-Depends:        base >= 4.0 && < 5,
                         parsec, utf8-string, mtl
-  Other-Modules:        Html HtmlText LineParser Notation Piki Tag Parsec
+  Other-Modules:        CharParser
+                        Html
+                        LineParser
+                        Notation
+                        Parsec
+                        Piki
+                        Types
 Source-Repository head
   Type:                 git
   Location:             git://github.com/kazu-yamamoto/piki.git
