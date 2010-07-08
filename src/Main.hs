@@ -5,6 +5,7 @@ module Main where
 import Control.Applicative
 import Html
 import Markdown
+import Piki
 import System.Console.GetOpt
 import System.Environment
 import System.IO
@@ -26,12 +27,13 @@ printUsage = error $ usageInfo usage options
 
 ----------------------------------------------------------------
 
-data Mode = HTML | Markdown | Version
+data Mode = HTML | Markdown | Version | Debug
 
 options :: [OptDescr Mode]
 options =
     [ Option ['m'] ["markdown"] (NoArg Markdown) "produce Markdown" 
-    , Option ['v'] ["version"]  (NoArg Version) "print version"
+    , Option ['v'] ["version"]  (NoArg Version)  "print version"
+    , Option ['d'] ["debug"]    (NoArg Debug)    "print internal data"
     ]
 
 compilerOpts :: [String] -> (Mode, [String])
@@ -86,4 +88,4 @@ main = do
         Version  -> printVersion
         Markdown -> doMD files
         HTML     -> doHtml files
-
+        Debug    -> piki <$> getContents >>= print

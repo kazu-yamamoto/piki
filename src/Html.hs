@@ -1,4 +1,4 @@
-module Html (toHTML) where
+module Html (toHTML, (\\\)) where
 
 import Data.Char
 import Data.Maybe

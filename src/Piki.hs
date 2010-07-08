@@ -123,9 +123,9 @@ division = DIV <$> attr <*> elts <* close
 paragraph :: LineParser Element
 paragraph = P <$> parag
   where
-    parag = (concat . intersperse "\n" <$> many1 paragLine) >>= getText
+    parag = concat . intersperse [R '\n'] <$> many1 paragLine
 
-paragLine :: LineParser String
-paragLine = firstChar (`notElem` pikiReserved)
+paragLine :: LineParser XString
+paragLine = firstChar (`notElem` pikiReserved) >>= getText
 
 ----------------------------------------------------------------
