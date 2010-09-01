@@ -20,8 +20,8 @@ instance ToMD Element where
     toMarkdown (P str)   = fromXString str ++ "\n\n"
     toMarkdown (PRE str) = unlines . map ("    " ++) . lines . fromXString $ str
     toMarkdown (UOL xl)  = toMarkdown xl
-    toMarkdown (DL ds)   = concatMap toMarkdown ds
-    toMarkdown (IMG is)  = concatMap toMarkdown is
+    toMarkdown (DL ds)   = concatMap toMarkdown ds ++ "\n"
+    toMarkdown (IMG is)  = concatMap toMarkdown is ++ "\n"
     toMarkdown (DIV (Class val) els) = "\n" ++ concatMap toMarkdown els \\\ ("div",[("class",val)]) ++ "\n"
     toMarkdown (DIV (Id val) els)    = "\n" ++ concatMap toMarkdown els \\\ ("div",[("id",val)]) ++ "\n"
 
@@ -32,8 +32,8 @@ instance ToMD Image where
     toMarkdown (Image title src) = "![" ++ title ++ "](" ++ src ++ ")\n"
 
 instance ToMD Xlist where
-    toMarkdown (Ulist xls) = concatMap fromUL xls
-    toMarkdown (Olist xls) = concatMap fromOL xls
+    toMarkdown (Ulist xls) = concatMap fromUL xls ++ "\n"
+    toMarkdown (Olist xls) = concatMap fromOL xls ++ "\n"
     toMarkdown Nil         = ""
 
 fromUL :: Xitem -> String
