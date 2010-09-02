@@ -1,6 +1,7 @@
 module CharParser (
     getText
   , getTitleFiles
+  , getTitleFileURLs
   ) where
 
 import LineParser
@@ -43,14 +44,27 @@ rawtext = do
 
 getTitleFiles :: String -> LineParser [Image]
 getTitleFiles str = case parse titleFiles "getTitleFiles" str of
-                      Right imgs -> return imgs
-                      Left  _    -> fail ": no '@ title file'"
+    Right imgs -> return imgs
+    Left  _    -> fail ": illegal '@ title file'"
 
 titleFiles :: Parser [Image]
 titleFiles = spaces *> sepBy1 titleFile spaces
 
 titleFile :: Parser Image
-titleFile = Image <$> word <*> (spaces *> word)
+titleFile = Image <$> word <*> (spaces *> word) <*> pure Nothing
+
+----------------------------------------------------------------
+
+getTitleFileURLs :: String -> LineParser [Image]
+getTitleFileURLs str = case parse titleFileURLs "getTitleFileURLs" str of
+    Right imgs -> return imgs
+    Left  _    -> fail ": illegal '@@ title file url'"
+
+titleFileURLs :: Parser [Image]
+titleFileURLs = spaces *> sepBy1 titleFileURL spaces
+
+titleFileURL :: Parser Image
+titleFileURL = Image <$> word <*> (spaces *> word) <*> (Just <$> (spaces *> word))
 
 ----------------------------------------------------------------
 

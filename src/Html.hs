@@ -38,6 +38,12 @@ instance ToHtml Element where
     toHtml (UOL xl)  = toHtml xl
     toHtml (DL ds)   = concatMap toHtml ds \\ "dl"
     toHtml (IMG is)  = concatMap toHtml is
+    toHtml (TABLE xss) = table
+      where
+        tds = map (concat . map toTD) xss
+        toTD x = fromXString x // "td"
+        tr  = concatMap (\\ "tr") tds
+        table = tr \\ "table"
     toHtml (DIV (Class val) els) = concatMap toHtml els \\\ ("div",[("class",val)])
     toHtml (DIV (Id val) els)    = concatMap toHtml els \\\ ("div",[("id",val)])
 
@@ -45,7 +51,11 @@ instance ToHtml Def where
     toHtml (Def title desc) = fromXString title // "dt" ++ fromXString desc // "dd"
 
 instance ToHtml Image where
-    toHtml (Image title src) = solo ("img",[("src",src),("alt",title),("title",title)])
+    toHtml (Image title src murl) = case murl of
+        Just url -> img %%% ("a",[("href",url)])
+        Nothing   -> img
+      where
+        img = solo ("img",[("src",src),("alt",title),("title",title)])
 
 instance ToHtml Xlist where
     toHtml (Ulist xls) = concatMap toHtml xls \\ "ul"

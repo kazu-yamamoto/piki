@@ -24,12 +24,13 @@ instance ToMD Element where
     toMarkdown (IMG is)  = concatMap toMarkdown is ++ "\n"
     toMarkdown (DIV (Class val) els) = "\n" ++ concatMap toMarkdown els \\\ ("div",[("class",val)]) ++ "\n"
     toMarkdown (DIV (Id val) els)    = "\n" ++ concatMap toMarkdown els \\\ ("div",[("id",val)]) ++ "\n"
-
+    toMarkdown (TABLE _) = "TABLE should be here\n"
+    
 instance ToMD Def where
     toMarkdown (Def title desc) = "* " ++ fromXString title ++ "\n> " ++ fromXString desc ++ "\n"
 
 instance ToMD Image where
-    toMarkdown (Image title src) = "![" ++ title ++ "](" ++ src ++ ")\n"
+    toMarkdown (Image title src _) = "![" ++ title ++ "](" ++ src ++ ")\n"
 
 instance ToMD Xlist where
     toMarkdown (Ulist xls) = concatMap fromUL xls ++ "\n"

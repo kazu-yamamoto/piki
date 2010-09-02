@@ -29,6 +29,7 @@ element = choice $ map lexeme [
   , uolist
   , dlist
   , image
+  , table
   , preformatted
   , paragraph
   ]
@@ -93,7 +94,37 @@ ditem = Def <$> title <*> desc
 image :: LineParser Element
 image = IMG <$> img
   where
-    img = firstCharIs' pikiImg >>= getTitleFiles
+    img = do
+      rest <- firstCharIs' pikiImg
+      if head rest == pikiImg
+         then getTitleFileURLs (tail rest)
+         else getTitleFiles rest
+
+----------------------------------------------------------------
+
+table :: LineParser Element
+table = TABLE <$> tbl
+  where
+    tbl = many1 tr
+    tr  = firstCharIs pikiTable >>= mapM getText . decomp pikiTable pikiEscape
+             
+decomp :: Char -> Char -> String -> [String]
+decomp _ _ "" = []
+decomp c e xs
+  | xs == [c] = []
+  | otherwise = s : decomp c e xs'
+  where
+    (s,xs') = break' c e $ tail xs
+
+break' :: Char -> Char -> String -> (String,String)
+break' _ _ ""  = ("","")
+break' c e xs@(x:xs')
+  | x == e     = let x' = head xs'
+                     (ys,zs) = break' c e (tail xs')
+                 in (x:x':ys,zs)
+  | x == c     = ([],xs)
+  | otherwise  = let (ys,zs) = break' c e xs'
+                 in (x:ys,zs)
 
 ----------------------------------------------------------------
 

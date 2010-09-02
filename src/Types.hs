@@ -7,6 +7,7 @@ data Element = HR
              | UOL Xlist
              | DL [Def]
              | IMG [Image]
+             | TABLE [[XString]]
              | DIV DivAttr [Element]
              deriving (Eq,Show)
 
@@ -19,7 +20,7 @@ type XString = [PString]
 data Xlist   = Ulist [Xitem] | Olist [Xitem] | Nil deriving (Eq,Show)
 data Xitem   = Item XString Xlist deriving (Eq,Show)
 data Def     = Def XString XString deriving (Eq,Show)
-data Image   = Image Title URL deriving (Eq,Show)
+data Image   = Image Title URL (Maybe URL) deriving (Eq,Show)
 data DivAttr = Class String | Id String deriving (Eq,Show)
 
 getTitle :: [Element] -> XString
