@@ -1,6 +1,7 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module LineParser (
-    LineParser
-  , reportError
+    reportError
   , satisfy
   , firstChar
   , firstCharIs
@@ -14,13 +15,12 @@ module LineParser (
   ) where
 
 import Data.Char
-import Data.List
+import qualified Data.Text.Lazy as L
 import Notation
 import Parsec
+import Prelude hiding (all, null)
 
 ----------------------------------------------------------------
-
-type LineParser a = GenParser String () a
 
 reportError :: ParseError -> a
 reportError err = error $ "error in line "
@@ -34,34 +34,35 @@ msgString _             = ""
 
 ----------------------------------------------------------------
 
-satisfy :: (String -> Bool) -> LineParser String
+satisfy :: (L.Text -> Bool) -> LineParser L.Text
 satisfy func = tokenPrim show next test
   where
     next pos _ _ = incSourceLine pos 1
-    test s
-     | func s    = Just s
-     | otherwise = Nothing
+    test txt
+      | func txt  = Just txt
+      | otherwise = Nothing
 
-firstChar :: (Char -> Bool) -> LineParser String
+firstChar :: (Char -> Bool) -> LineParser L.Text
 firstChar func = satisfy $ test func
     where
-      test _ ""    = False
-      test f (c:_) = f c
+      test f txt
+        | L.null txt = False
+        | otherwise  = f (L.head txt)
 
-firstCharIs :: Char -> LineParser String
+firstCharIs :: Char -> LineParser L.Text
 firstCharIs c = firstChar (== c)
 
-firstCharIs' :: Char -> LineParser String
-firstCharIs' c = tail <$> firstCharIs c
+firstCharIs' :: Char -> LineParser L.Text
+firstCharIs' c = L.tail <$> firstCharIs c
 
-firstCharIsNot :: Char -> LineParser String
+firstCharIsNot :: Char -> LineParser L.Text
 firstCharIsNot c = firstChar (/= c)
 
-prefixIs :: String -> LineParser String
-prefixIs str = satisfy (str `isPrefixOf`)
+prefixIs :: L.Text -> LineParser L.Text
+prefixIs pre = satisfy (pre `L.isPrefixOf`)
 
-prefixIsNot :: String -> LineParser String
-prefixIsNot str = satisfy (not . isPrefixOf str)
+prefixIsNot :: L.Text -> LineParser L.Text
+prefixIsNot pre = satisfy (not . L.isPrefixOf pre)
 
 ----------------------------------------------------------------
 
@@ -71,8 +72,8 @@ lexeme p = p <* clean
 clean :: LineParser ()
 clean = skipMany (blank <|> comment)
 
-blank :: LineParser String
-blank = satisfy $ all isSpace
+blank :: LineParser L.Text
+blank = satisfy $ L.all isSpace
 
-comment :: LineParser String
+comment :: LineParser L.Text
 comment = firstCharIs pikiComment

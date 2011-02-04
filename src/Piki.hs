@@ -1,18 +1,21 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Piki (piki) where
 
+import CharParser
 import Data.Char
 import Data.List (intersperse)
+import qualified Data.Text.Lazy as L
 import LineParser
-import CharParser
 import Notation
 import Types
 
 ----------------------------------------------------------------
 
-piki :: String -> [Element]
+piki :: L.Text -> [Element]
 piki line = either reportError id res
   where
-    res = parse document "" $ lines line
+    res = parse document "" $ L.lines line
 
 ----------------------------------------------------------------
 
@@ -44,8 +47,8 @@ headline = do
   where
     levelTitle line = (lvl,txt)
       where
-        (mark, txt) = span (== pikiTitle) line
-        lvl = length mark
+        (mark, txt) = L.span (== pikiTitle) line
+        lvl = fromIntegral $  L.length mark
 
 ----------------------------------------------------------------
 
@@ -75,8 +78,10 @@ xitem c n = Item <$> item c n <*> xlist (n + 1)
 xlist :: Int -> LineParser Xlist
 xlist n = ulist n <|> olist n <|> return Nil
 
-item :: Char -> Int -> LineParser XString
-item c n = (drop n <$> prefixIs (replicate n c)) >>= getText
+item :: Char -> Int -> LineParser XText
+item c n = (L.drop (fromIntegral n) <$> prefixIs pre) >>= getText
+  where
+    pre = L.pack $ replicate n c
 
 ----------------------------------------------------------------
 
@@ -96,9 +101,11 @@ image = IMG <$> img
   where
     img = do
       rest <- firstCharIs' pikiImg
-      if head rest == pikiImg
-         then getTitleFileURLs (tail rest)
-         else getTitleFiles rest
+      case L.uncons rest of
+        Just (x,rest')
+          | x == pikiImg -> getTitleFileURLs rest'
+          | otherwise    -> getTitleFiles rest
+        Nothing          -> getTitleFiles rest
 
 ----------------------------------------------------------------
 
@@ -107,34 +114,42 @@ table = TABLE <$> tbl
   where
     tbl = many1 tr
     tr  = firstCharIs pikiTable >>= mapM getText . decomp pikiTable pikiEscape
-             
-decomp :: Char -> Char -> String -> [String]
+
+decomp :: Char -> Char -> L.Text -> [L.Text]
 decomp _ _ "" = []
 decomp c e xs
-  | xs == [c] = []
-  | otherwise = s : decomp c e xs'
+  | L.head xs == c = []
+  | otherwise      = s : decomp c e xs'
   where
-    (s,xs') = break' c e $ tail xs
+    (s,xs') = break2 c e $ L.tail xs
 
-break' :: Char -> Char -> String -> (String,String)
-break' _ _ ""  = ("","")
-break' c e xs@(x:xs')
-  | x == e     = let x' = head xs'
-                     (ys,zs) = break' c e (tail xs')
-                 in (x:x':ys,zs)
-  | x == c     = ([],xs)
-  | otherwise  = let (ys,zs) = break' c e xs'
+break2 :: Char -> Char -> L.Text -> (L.Text,L.Text)
+break2 c e txt =  (L.pack ys, txt')
+  where
+    (ys, txt') = break2' c e txt
+
+break2' :: Char -> Char -> L.Text -> (String,L.Text)
+break2' _ _ ""  = ("","")
+break2' c e xs
+  | x == e     = let x' = L.head xs'
+                     (ys,zs) = break2' c e (L.tail xs')
+                 in (x:x':ys, zs)
+  | x == c     = ("", xs)
+  | otherwise  = let (ys,zs) = break2' c e xs'
                  in (x:ys,zs)
+  where
+   x = L.head xs
+   xs' = L.tail xs
 
 ----------------------------------------------------------------
 
 preformatted :: LineParser Element
-preformatted = PRE . toXString <$> (open *> pre <* close)
+preformatted = PRE . toXText <$> (open *> pre <* close)
   where
     open  = prefixIs pikiPreOpen
-    pre   = unlines <$> many (prefixIsNot pikiPreClose)
-    close = prefixIs pikiPreClose <?> ": no \"" ++ pikiPreClose ++ "\""
-    toXString xs = [L xs]
+    pre   = many (prefixIsNot pikiPreClose)
+    close = prefixIs pikiPreClose <?> ": no \"" ++ L.unpack pikiPreClose ++ "\""
+    toXText xs = [L xs]
 
 ----------------------------------------------------------------
 
@@ -145,9 +160,9 @@ division = DIV <$> attr <*> elts <* close
     elts = many element
     close = firstCharIs pikiDivClose <?> ": no \"" ++ [pikiDivClose] ++ "\""
     getAttr value
-      | any isUpper value = Id $ toLowerWord value
-      | otherwise         = Class value
-    toLowerWord = map toLower
+      | L.any isUpper value = Id $ toLowerWord value
+      | otherwise           = Class value
+    toLowerWord = L.map toLower
 
 ----------------------------------------------------------------
 
@@ -156,7 +171,7 @@ paragraph = P <$> parag
   where
     parag = concat . intersperse [R '\n'] <$> many1 paragLine
 
-paragLine :: LineParser XString
+paragLine :: LineParser XText
 paragLine = firstChar (`notElem` pikiReserved) >>= getText
 
 ----------------------------------------------------------------

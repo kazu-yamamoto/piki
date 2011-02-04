@@ -1,55 +1,60 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Markdown (toMD) where
 
+import Builder
+import qualified Data.Text.Lazy as L
+import Html ((\\\))
 import Piki
 import Types
-import Html ((\\\))
 
 ----------------------------------------------------------------
 
-toMD :: String -> String
-toMD = concatMap toMarkdown . piki
+toMD :: L.Text -> L.Text
+toMD = build . mcatmap toMarkdown . piki
 
 ----------------------------------------------------------------
 
 class ToMD a where
-    toMarkdown :: a -> String
+    toMarkdown :: a -> Builder
 
 instance ToMD Element where
     toMarkdown HR        = "********************************\n"
-    toMarkdown (H n str) = replicate n '#' ++ " " ++ fromXString str ++ "\n"
-    toMarkdown (P str)   = fromXString str ++ "\n\n"
-    toMarkdown (PRE str) = unlines . map ("    " ++) . lines . fromXString $ str
+    toMarkdown (H n str) = toB (L.pack (replicate n '#')) +++ " " +++ fromXText str +++ "\n"
+    toMarkdown (P str)   = fromXText str +++ "\n\n"
+    toMarkdown (PRE str) = fromXText str
     toMarkdown (UOL xl)  = toMarkdown xl
-    toMarkdown (DL ds)   = concatMap toMarkdown ds ++ "\n"
-    toMarkdown (IMG is)  = concatMap toMarkdown is ++ "\n"
-    toMarkdown (DIV (Class val) els) = "\n" ++ concatMap toMarkdown els \\\ ("div",[("class",val)]) ++ "\n"
-    toMarkdown (DIV (Id val) els)    = "\n" ++ concatMap toMarkdown els \\\ ("div",[("id",val)]) ++ "\n"
+    toMarkdown (DL ds)   = mcatmap toMarkdown ds +++ "\n"
+    toMarkdown (IMG is)  = mcatmap toMarkdown is +++ "\n"
+    toMarkdown (DIV (Class val) els) = "\n" +++ mcatmap toMarkdown els \\\ ("div",[("class", toB val)]) +++ "\n"
+    toMarkdown (DIV (Id val) els)    = "\n" +++ mcatmap toMarkdown els \\\ ("div",[("id", toB val)]) +++ "\n"
     toMarkdown (TABLE _) = "TABLE should be here\n"
-    
+
 instance ToMD Def where
-    toMarkdown (Def title desc) = "* " ++ fromXString title ++ "\n> " ++ fromXString desc ++ "\n"
+    toMarkdown (Def title desc) = "* " +++ fromXText title +++ "\n> " +++ fromXText desc +++ "\n"
 
 instance ToMD Image where
-    toMarkdown (Image title src _) = "![" ++ title ++ "](" ++ src ++ ")\n"
+    toMarkdown (Image title src _) = "![" +++ toB title +++ "](" +++ toB src +++ ")\n"
 
 instance ToMD Xlist where
-    toMarkdown (Ulist xls) = concatMap fromUL xls ++ "\n"
-    toMarkdown (Olist xls) = concatMap fromOL xls ++ "\n"
+    toMarkdown (Ulist xls) = mcatmap fromUL xls +++ "\n"
+    toMarkdown (Olist xls) = mcatmap fromOL xls +++ "\n"
     toMarkdown Nil         = ""
 
-fromUL :: Xitem -> String
-fromUL (Item str Nil) = "* " ++ fromXString str ++ "\n"
+fromUL :: Xitem -> Builder
+fromUL (Item str Nil) = "* " +++ fromXText str +++ "\n"
 fromUL _              = error "Markdown does not support nested lists"
 
-fromOL :: Xitem -> String
-fromOL (Item str Nil) = "1. " ++ fromXString str ++ "\n"
+fromOL :: Xitem -> Builder
+fromOL (Item str Nil) = "1. " +++ fromXText str +++ "\n"
 fromOL _              = error "Markdown does not support nested lists"
 
-fromXString :: [PString] -> String
-fromXString = concatMap toStr
+fromXText :: XText -> Builder
+fromXText = mcatmap toBld
   where
-    toStr Null          = ""
-    toStr (R c)         = [c] -- xxx asterisk
-    toStr (E c)         = [c] -- xxx
-    toStr (L xs)        = xs -- xxx
-    toStr (A title url) = "[" ++ title ++ "](" ++ url ++ ")"
+    toBld Null          = ""
+    toBld (R c)         = toB (L.singleton c)-- xxx asterisk
+    toBld (E c)         = toB (L.singleton c) -- xxx
+    toBld (L xs)        = mcatmap toLine xs -- xxx
+    toBld (A title url) = "[" +++ toB title +++ "](" +++ toB url +++ ")"
+    toLine txt = "    " +++ toB txt +++ "\n"

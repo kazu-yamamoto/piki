@@ -1,14 +1,12 @@
-{-# LANGUAGE CPP #-}
-
 module Main where
 
 import Control.Applicative
+import qualified Data.Text.Lazy.IO as L
 import Html
 import Markdown
 import Piki
 import System.Console.GetOpt
 import System.Environment
-import System.IO
 
 ----------------------------------------------------------------
 
@@ -31,7 +29,7 @@ data Mode = HTML | Markdown | Version | Debug
 
 options :: [OptDescr Mode]
 options =
-    [ Option ['m'] ["markdown"] (NoArg Markdown) "produce Markdown" 
+    [ Option ['m'] ["markdown"] (NoArg Markdown) "produce Markdown"
     , Option ['v'] ["version"]  (NoArg Version)  "print version"
     , Option ['d'] ["debug"]    (NoArg Debug)    "print internal data"
     ]
@@ -44,48 +42,24 @@ compilerOpts argv = case getOpt Permute options argv of
 
 ----------------------------------------------------------------
 
-setUTF8 :: Handle -> IO Handle
-setUTF8 h = do
-#if __GLASGOW_HASKELL__ >= 611
-    hSetEncoding h utf8
-#endif
-    return h
-
-readFileU8 :: FilePath -> IO String
-readFileU8 file = openFile file ReadMode >>= setUTF8 >>= hGetContents
-
-----------------------------------------------------------------
-
 doHtml :: [FilePath] -> IO ()
-doHtml [template,input] = do
-    tmp <- readFileU8 template
-    inp <- readFileU8 input
-    putStr $ toHTML tmp inp
-doHtml [template] = do
-    tmp <- readFileU8 template
-    inp <- getContents
-    putStr $ toHTML tmp inp
+doHtml [template,input] = toHTML <$> L.readFile template <*> L.readFile input >>= L.putStr
+doHtml [template] = toHTML <$> L.readFile template <*> L.getContents >>= L.putStr
 doHtml _ = printUsage
 
 ----------------------------------------------------------------
 
 doMD :: [FilePath] -> IO ()
-doMD [input] = do
-    inp <- readFileU8 input
-    putStr $ toMD inp
-doMD [] = do
-    inp <- getContents
-    putStr $ toMD inp
-doMD _ = printUsage
+doMD [input] = toMD <$> L.readFile input >>= L.putStr
+doMD []      = toMD <$> L.getContents    >>= L.putStr
+doMD _       = printUsage
 
 ----------------------------------------------------------------
 main :: IO ()
 main = do
-    setUTF8 stdin
-    setUTF8 stdout
     (m,files) <- compilerOpts <$> getArgs
     case m of
         Version  -> printVersion
         Markdown -> doMD files
         HTML     -> doHtml files
-        Debug    -> piki <$> getContents >>= print
+        Debug    -> piki <$> L.getContents >>= print

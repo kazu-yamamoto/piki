@@ -4,34 +4,35 @@ module CharParser (
   , getTitleFileURLs
   ) where
 
+import qualified Data.Text.Lazy as L
 import LineParser
 import Notation
 import Types
 
 ----------------------------------------------------------------
 
-getText :: String -> LineParser XString
-getText str = case parse text "fromText" str of
+getText :: L.Text -> LineParser XText
+getText txt = case parse text "fromText" txt of
     Right cooked -> return cooked
     Left  _      -> fail ": link or quote error"
 
-text :: Parser XString
+text :: Parser XText
 text = spaces *> contents
   where
     contents = many (link <|> shrinkSpaces <|> rawtext)
 
-link :: Parser PString
+link :: Parser PText
 link = A <$> (open *> word) <*> (spaces *> word <* close)
   where
     open = char pikiAOpen
     close = char pikiAClose
 
-shrinkSpaces :: Parser PString
+shrinkSpaces :: Parser PText
 shrinkSpaces = do
     many1 space
     try (Null <$ eof) <|> return (R ' ')
 
-rawtext :: Parser PString
+rawtext :: Parser PText
 rawtext = do
     c <- anyChar
     if c == pikiEscape
@@ -42,7 +43,7 @@ rawtext = do
 
 ----------------------------------------------------------------
 
-getTitleFiles :: String -> LineParser [Image]
+getTitleFiles :: L.Text -> LineParser [Image]
 getTitleFiles str = case parse titleFiles "getTitleFiles" str of
     Right imgs -> return imgs
     Left  _    -> fail ": illegal '@ title file'"
@@ -55,7 +56,7 @@ titleFile = Image <$> word <*> (spaces *> word) <*> pure Nothing
 
 ----------------------------------------------------------------
 
-getTitleFileURLs :: String -> LineParser [Image]
+getTitleFileURLs :: L.Text -> LineParser [Image]
 getTitleFileURLs str = case parse titleFileURLs "getTitleFileURLs" str of
     Right imgs -> return imgs
     Left  _    -> fail ": illegal '@@ title file url'"
@@ -68,15 +69,15 @@ titleFileURL = Image <$> word <*> (spaces *> word) <*> (Just <$> (spaces *> word
 
 ----------------------------------------------------------------
 
-word :: Parser String
+word :: Parser L.Text
 word = quoted <|> unquoted
 
-quoted :: Parser String
-quoted = open *> inside <* close
+quoted :: Parser L.Text
+quoted = L.pack <$> (open *> inside <* close)
   where
     open   = char '"'
     inside = many1 $ noneOf "\t\n[]\""
     close  = char '"'
 
-unquoted :: Parser String
-unquoted = many1 $ noneOf " \t\n[]\""
+unquoted :: Parser L.Text
+unquoted = L.pack <$> (many1 $ noneOf " \t\n[]\"")
