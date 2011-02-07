@@ -2,6 +2,7 @@ module CharParser (
     getText
   , getTitleFiles
   , getTitleFileURLs
+  , getTDs
   ) where
 
 import qualified Data.Text.Lazy as L
@@ -12,7 +13,7 @@ import Types
 ----------------------------------------------------------------
 
 getText :: L.Text -> LineParser XText
-getText txt = case parse text "fromText" txt of
+getText txt = case parse text "getText" txt of
     Right cooked -> return cooked
     Left  _      -> fail ": link or quote error"
 
@@ -81,3 +82,18 @@ quoted = L.pack <$> (open *> inside <* close)
 
 unquoted :: Parser L.Text
 unquoted = L.pack <$> (many1 $ noneOf " \t\n[]\"")
+
+----------------------------------------------------------------
+
+getTDs :: Char -> Char -> L.Text -> LineParser [L.Text]
+getTDs c e txt = case parse (tds c e) "getTDs" txt of
+    Right elms   -> return elms
+    Left  _      -> fail "| illegal '|elm|elm|"
+
+tds :: Char -> Char -> Parser [L.Text]
+tds c e = map L.pack <$> many1 (td c e)
+
+td :: Char -> Char -> Parser String
+td c e = ([] <$ char c)
+     <|> try ((:) <$> (char e *> anyChar) <*> td c e)
+     <|> ((:) <$> anyChar <*> td c e)

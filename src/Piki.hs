@@ -113,33 +113,9 @@ table :: LineParser Element
 table = TABLE <$> tbl
   where
     tbl = many1 tr
-    tr  = firstCharIs pikiTable >>= mapM getText . decomp pikiTable pikiEscape
-
-decomp :: Char -> Char -> L.Text -> [L.Text]
-decomp _ _ "" = []
-decomp c e xs
-  | L.head xs == c = []
-  | otherwise      = s : decomp c e xs'
-  where
-    (s,xs') = break2 c e $ L.tail xs
-
-break2 :: Char -> Char -> L.Text -> (L.Text,L.Text)
-break2 c e txt =  (L.pack ys, txt')
-  where
-    (ys, txt') = break2' c e txt
-
-break2' :: Char -> Char -> L.Text -> (String,L.Text)
-break2' _ _ ""  = ("","")
-break2' c e xs
-  | x == e     = let x' = L.head xs'
-                     (ys,zs) = break2' c e (L.tail xs')
-                 in (x:x':ys, zs)
-  | x == c     = ("", xs)
-  | otherwise  = let (ys,zs) = break2' c e xs'
-                 in (x:ys,zs)
-  where
-   x = L.head xs
-   xs' = L.tail xs
+    tr  = firstCharIs' pikiTable
+      >>= getTDs pikiTable pikiEscape
+      >>= mapM getText
 
 ----------------------------------------------------------------
 
