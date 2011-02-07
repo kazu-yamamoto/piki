@@ -11,10 +11,11 @@
 <p><a href="../en/">English</a></p>
 <div class="right">
 <p>山本和彦<br />
-2010.3.10<br /></p>
+作成：2010.3.10<br />
+更新：2011.2.7</p>
 </div>
 <p>Piki は、WIKI の一種です。他の WIKI と同様、Piki は文章の構造を表現するための簡潔な記法を提供します。しかし他の WIKI と違って、Web サーバーを使いません。&quot;piki&quot; は、Piki ファイルを HTML ファイルに変換するためのコマンドライン・プログラムです。</p>
-<p>&quot;piki&quot; は、<a href="http://www.haskell.org">Haskell</a> の関数型パーサーである <a href="http://legacy.cs.uu.nl/daan/download/parsec/parsec.html">Parsec</a> で書かれています。現在、<a href="http://hackage.haskell.org/package/piki">Piki version 0.3.0</a> を Hackage で公開しています。<a href="http://github.com/kazu-yamamoto/piki">Git リポジトリー</a>は、github にあります。</p>
+<p>&quot;piki&quot; は、<a href="http://www.haskell.org">Haskell</a> の関数型パーサーである <a href="http://research.microsoft.com/en-us/um/people/daan/parsec.html">Parsec</a> で書かれており、<a href="http://hackage.haskell.org/package/piki">HackageDB</a> で公開しています。<a href="http://github.com/kazu-yamamoto/piki">Git リポジトリー</a>は、github にあります。</p>
 <h2>&quot;piki&quot; コマンド</h2>
 <p>&quot;piki&quot; は、HTML 雛形ファイル(&quot;template.html&quot;とする) と Piki 記法で書かれたファイル(&quot;index.piki&quot;とする)をコマンドライン引数に取り、HTML ファイル(&quot;index.html&quot; とする)を出力します。</p>
 <pre>
@@ -68,6 +69,12 @@
 @ &quot;Image of flowers&quot; http://example.com/img/flower.jpg
 @ 僕の猫 cats.jpg 私の犬 dogs.jpg
 </pre>
+<h3>クリックできる画像</h3>
+<p>&quot;@@&quot; はクリックできる画像(&lt;img /&gt;)を意味します。&quot;@&quot; には、タイトル、画像のURL、参照URL の三組が続きます。それらは、空白で区切ります。タイトルが空白を含む場合は、ダブルクオートで囲む必要があります。</p>
+<pre>
+@@ English /image/english.png /en
+@@ Japanese /image/japanese.png /ja
+</pre>
 <h3>整形済みテキスト</h3>
 <p>整形済みテキスト(&lt;pre&gt;)は、&quot;&gt;|&quot; と &quot;|&lt;&quot; で囲みます。</p>
 <pre>
@@ -106,6 +113,13 @@ multiple lines.
 <p>リンクを張るには、&quot;[title url]&quot; という記法を用います。タイトルが空白を含む場合は、ダブルクオートで囲む必要があります。もちろん、この記法は行頭でなくとも使えます。</p>
 <pre>
 僕の好きなコンピュータ言語は [Haskell http://www.haskell.org/] です。
+</pre>
+<h3>表</h3>
+<p>表は、各要素を &quot;|&quot; で区切って記述します。</p>
+<pre>
+|システム|種類|
+|[Hugs http://www.haskell.org/hugs/]|インタープリター|
+|[GHC http://www.haskell.org/ghc/]|コンパイラー\|インタープリター|
 </pre>
 <h3>回避文字</h3>
 <p>回避文字は '\' です。&quot;[]&quot; と表示するには &quot;\[\]&quot; と書きましょう。</p>

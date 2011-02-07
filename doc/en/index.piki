@@ -3,7 +3,8 @@
 [Japanese ../ja/]
 {right
 Kazu Yamamoto\<br /\>
-2010.3.10\<br /\>
+Created: 2010.3.10\<br /\>
+Modified: 2011.2.7
 }
 
 Piki is yet another WIKI. Like other WIKI systems, Piki provides
@@ -12,10 +13,10 @@ it does not use Web servers.
 "piki" is a command line program to convert a Piki text file to
 an HTML file.
 
-"piki" is written in 
-[Parsec http://legacy.cs.uu.nl/daan/download/parsec/parsec.html], 
+"Piki" is written in 
+[Parsec http://research.microsoft.com/en-us/um/people/daan/parsec.html], 
 a functional parser of [Haskell http://www.haskell.org].
-You can download ["Piki version 0.3.0" http://hackage.haskell.org/package/piki] from Hackage.
+You can download ["Piki" http://hackage.haskell.org/package/piki] from Hackage.
 ["Git repository" http://github.com/kazu-yamamoto/piki] is on github.
 
 ** The "piki" command
@@ -102,12 +103,24 @@ of definition list(<dl>). This notation cannot be recursive.
 *** Image
 
 "@" indicates images (<img />). "@" should be followed with
-pairs of title and URL. They should be separated with spaces. If a title
+pairs of title and image URL. They should be separated with spaces. If a title
 contains spaces, it should be quoted with double quote.
 
 >|
 @ "Image of flowers" http://example.com/img/flower.jpg
 @ "My cats" cats.jpg "My dogs" dogs.jpg
+|<
+
+*** Clickable Image
+
+"@@" indicates images (<img />). "@" should be followed with
+sequences of title, image URL, and reference URL. 
+They should be separated with spaces. If a title
+contains spaces, it should be quoted with double quote.
+
+>|
+@@ English /image/english.png /en
+@@ Japanese /image/japanese.png /ja
 |<
 
 ***Pre-formatted
@@ -168,6 +181,16 @@ Of course, this does not need to be placed in the beginning of lines.
 
 >|
 My favorite computer language is [Haskell http://www.haskell.org/].
+|<
+
+***Table
+
+To create a table, enumerates elements separated by "|".
+
+>|
+|System|Type|
+|[Hugs http://www.haskell.org/hugs/]|Interpreter|
+|[GHC http://www.haskell.org/ghc/]|Compiler\|Interpreter|
 |<
 
 ***Escape character
