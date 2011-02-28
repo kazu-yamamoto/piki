@@ -1,5 +1,5 @@
 Name:                   piki
-Version:                0.5.0
+Version:                0.5.1
 Author:                 Kazu Yamamoto <kazu@iij.ad.jp>
 Maintainer:             Kazu Yamamoto <kazu@iij.ad.jp>
 License:                BSD3
@@ -32,9 +32,11 @@ Executable piki
     GHC-Options:        -Wall
   Build-Depends:        base >= 4.0 && < 5,
                         parsec3, text, mtl
-  Other-Modules:        CharParser
+  Other-Modules:        Builder
+                        CharParser
                         Html
                         LineParser
+                        Markdown
                         Notation
                         Parsec
                         Piki
