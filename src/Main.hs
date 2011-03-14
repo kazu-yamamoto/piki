@@ -11,7 +11,7 @@ import System.Environment
 ----------------------------------------------------------------
 
 version :: String
-version = "0.5.0"
+version = "0.5.2"
 
 printVersion :: IO ()
 printVersion = putStrLn $ "piki version " ++ version

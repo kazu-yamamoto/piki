@@ -1,15 +1,13 @@
 Name:                   piki
-Version:                0.5.1
+Version:                0.5.2
 Author:                 Kazu Yamamoto <kazu@iij.ad.jp>
 Maintainer:             Kazu Yamamoto <kazu@iij.ad.jp>
 License:                BSD3
 License-File:           LICENSE
 Homepage:               http://www.mew.org/~kazu/proj/piki/
-Synopsis:               Yet another Wiki format converter
-Description:            "piki" is a script to convert a WIKI text file
-                        to an HTML file. Unlike other WIKI systems,
-                        "piki" is not executed through a web server.
-                        You can use "piki" in the shell command line.
+Synopsis:               Yet another text-to-html converter
+Description:            "piki" is a script to convert a simple text file
+                        to an HTML file.
 Category:               Web
 Cabal-Version:          >= 1.6
 Build-Type:             Simple
@@ -31,7 +29,7 @@ Executable piki
   else
     GHC-Options:        -Wall
   Build-Depends:        base >= 4.0 && < 5,
-                        parsec3, text, mtl
+                        parsec >= 3, text, mtl
   Other-Modules:        Builder
                         CharParser
                         Html
