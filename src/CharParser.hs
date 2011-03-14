@@ -95,5 +95,5 @@ tds c e = map L.pack <$> many1 (td c e)
 
 td :: Char -> Char -> Parser String
 td c e = ([] <$ char c)
-     <|> try ((:) <$> (char e *> anyChar) <*> td c e)
+     <|> try ((\x1 x2 xs -> x1:x2:xs) <$> char e <*> anyChar <*> td c e)
      <|> ((:) <$> anyChar <*> td c e)
