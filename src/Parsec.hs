@@ -1,17 +1,12 @@
 {-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Parsec (
-      module Control.Applicative
-    , module Text.Parsec
-    , module Text.Parsec.Error
-    , Parser, LineParser
-    ) where
+module Parsec (module AP, Parser, LineParser) where
 
-import Control.Applicative hiding (many,optional,(<|>))
+import Control.Applicative as AP hiding (many,optional,(<|>))
 import qualified Data.Text.Lazy as L
-import Text.Parsec hiding (satisfy, ParseError, errorPos)
-import Text.Parsec.Error
+import Text.Parsec as AP hiding (satisfy, ParseError, errorPos)
+import Text.Parsec.Error as AP
 import Text.Parsec.Prim
 
 type Parser = Parsec L.Text ()

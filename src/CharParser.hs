@@ -81,7 +81,7 @@ quoted = L.pack <$> (open *> inside <* close)
     close  = char '"'
 
 unquoted :: Parser L.Text
-unquoted = L.pack <$> (many1 $ noneOf " \t\n[]\"")
+unquoted = L.pack <$> many1 (noneOf " \t\n[]\"")
 
 ----------------------------------------------------------------
 

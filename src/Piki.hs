@@ -4,7 +4,7 @@ module Piki (piki) where
 
 import CharParser
 import Data.Char
-import Data.List (intersperse)
+import Data.List (intercalate)
 import qualified Data.Text.Lazy as L
 import LineParser
 import Notation
@@ -143,9 +143,7 @@ division = DIV <$> attr <*> elts <* close
 ----------------------------------------------------------------
 
 paragraph :: LineParser Element
-paragraph = P <$> parag
-  where
-    parag = concat . intersperse [R '\n'] <$> many1 paragLine
+paragraph = P . intercalate [R '\n'] <$> many1 paragLine
 
 paragLine :: LineParser XText
 paragLine = firstChar (`notElem` pikiReserved) >>= getText
