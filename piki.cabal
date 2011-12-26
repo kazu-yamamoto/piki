@@ -39,6 +39,7 @@ Executable piki
                         Parsec
                         Piki
                         Types
+                        Paths_piki
 Source-Repository head
   Type:                 git
   Location:             git://github.com/kazu-yamamoto/piki.git

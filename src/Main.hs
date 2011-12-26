@@ -2,8 +2,10 @@ module Main where
 
 import Control.Applicative
 import qualified Data.Text.Lazy.IO as L
+import qualified Data.Version as V
 import Html
 import Markdown
+import qualified Paths_piki as V
 import Piki
 import System.Console.GetOpt
 import System.Environment
@@ -11,7 +13,7 @@ import System.Environment
 ----------------------------------------------------------------
 
 version :: String
-version = "0.5.2"
+version = V.showVersion V.version
 
 printVersion :: IO ()
 printVersion = putStrLn $ "piki version " ++ version
