@@ -9,7 +9,7 @@ Synopsis:               Yet another text-to-html converter
 Description:            "piki" is a script to convert a simple text file
                         to an HTML file.
 Category:               Web
-Cabal-Version:          >= 1.6
+Cabal-Version:          >= 1.8
 Build-Type:             Simple
 Data-Files:             doc/en/Makefile
                         doc/en/default.css
