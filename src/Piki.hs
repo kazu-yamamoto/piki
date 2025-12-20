@@ -25,30 +25,33 @@ document = clean *> many element <* eof
 ----------------------------------------------------------------
 
 element :: LineParser Element
-element = choice $ map lexeme [
-    division
-  , headline
-  , hrule
-  , uolist
-  , dlist
-  , image
-  , table
-  , preformatted
-  , paragraph
-  ]
+element =
+    choice $
+        map
+            lexeme
+            [ division
+            , headline
+            , hrule
+            , uolist
+            , dlist
+            , image
+            , table
+            , preformatted
+            , paragraph
+            ]
 
 ----------------------------------------------------------------
 
 headline :: LineParser Element
 headline = do
-    (lvl,txt) <- levelTitle <$> firstCharIs pikiTitle
+    (lvl, txt) <- levelTitle <$> firstCharIs pikiTitle
     ttl <- getText txt
     return $ H lvl ttl
   where
-    levelTitle line = (lvl,txt)
+    levelTitle line = (lvl, txt)
       where
         (mark, txt) = L.span (== pikiTitle) line
-        lvl = fromIntegral $  L.length mark
+        lvl = fromIntegral $ L.length mark
 
 ----------------------------------------------------------------
 
@@ -92,7 +95,7 @@ ditem :: LineParser Def
 ditem = Def <$> title <*> desc
   where
     title = firstCharIs' pikiDlT >>= getText
-    desc  = (firstCharIs' pikiDlD <?> ": no \"!\"") >>= getText
+    desc = (firstCharIs' pikiDlD <?> ": no \"!\"") >>= getText
 
 ----------------------------------------------------------------
 
@@ -100,12 +103,12 @@ image :: LineParser Element
 image = IMG <$> img
   where
     img = do
-      rest <- firstCharIs' pikiImg
-      case L.uncons rest of
-        Just (x,rest')
-          | x == pikiImg -> getTitleFileURLs rest'
-          | otherwise    -> getTitleFiles rest
-        Nothing          -> getTitleFiles rest
+        rest <- firstCharIs' pikiImg
+        case L.uncons rest of
+            Just (x, rest')
+                | x == pikiImg -> getTitleFileURLs rest'
+                | otherwise -> getTitleFiles rest
+            Nothing -> getTitleFiles rest
 
 ----------------------------------------------------------------
 
@@ -113,17 +116,18 @@ table :: LineParser Element
 table = TABLE <$> tbl
   where
     tbl = many1 tr
-    tr  = firstCharIs' pikiTable
-      >>= getTDs pikiTable pikiEscape
-      >>= mapM getText
+    tr =
+        firstCharIs' pikiTable
+            >>= getTDs pikiTable pikiEscape
+            >>= mapM getText
 
 ----------------------------------------------------------------
 
 preformatted :: LineParser Element
 preformatted = PRE . toXText <$> (open *> pre <* close)
   where
-    open  = prefixIs pikiPreOpen
-    pre   = many (prefixIsNot pikiPreClose)
+    open = prefixIs pikiPreOpen
+    pre = many (prefixIsNot pikiPreClose)
     close = prefixIs pikiPreClose <?> ": no \"" ++ L.unpack pikiPreClose ++ "\""
     toXText xs = [L xs]
 
@@ -136,8 +140,8 @@ division = DIV <$> attr <*> elts <* close
     elts = many element
     close = firstCharIs pikiDivClose <?> ": no \"" ++ [pikiDivClose] ++ "\""
     getAttr value
-      | L.any isUpper value = Id $ toLowerWord value
-      | otherwise           = Class value
+        | L.any isUpper value = Id $ toLowerWord value
+        | otherwise = Class value
     toLowerWord = L.map toLower
 
 ----------------------------------------------------------------

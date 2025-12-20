@@ -1,9 +1,9 @@
 module CharParser (
-    getText
-  , getTitleFiles
-  , getTitleFileURLs
-  , getTDs
-  ) where
+    getText,
+    getTitleFiles,
+    getTitleFileURLs,
+    getTDs,
+) where
 
 import qualified Data.Text.Lazy as L
 import LineParser
@@ -15,7 +15,7 @@ import Types
 getText :: L.Text -> LineParser XText
 getText txt = case parse text "getText" txt of
     Right cooked -> return cooked
-    Left  _      -> fail ": link or quote error"
+    Left _ -> fail ": link or quote error"
 
 text :: Parser XText
 text = spaces *> contents
@@ -47,7 +47,7 @@ rawtext = do
 getTitleFiles :: L.Text -> LineParser [Image]
 getTitleFiles str = case parse titleFiles "getTitleFiles" str of
     Right imgs -> return imgs
-    Left  _    -> fail ": illegal '@ title file'"
+    Left _ -> fail ": illegal '@ title file'"
 
 titleFiles :: Parser [Image]
 titleFiles = spaces *> sepBy1 titleFile spaces
@@ -60,7 +60,7 @@ titleFile = Image <$> word <*> (spaces *> word) <*> pure Nothing
 getTitleFileURLs :: L.Text -> LineParser [Image]
 getTitleFileURLs str = case parse titleFileURLs "getTitleFileURLs" str of
     Right imgs -> return imgs
-    Left  _    -> fail ": illegal '@@ title file url'"
+    Left _ -> fail ": illegal '@@ title file url'"
 
 titleFileURLs :: Parser [Image]
 titleFileURLs = spaces *> sepBy1 titleFileURL spaces
@@ -76,9 +76,9 @@ word = quoted <|> unquoted
 quoted :: Parser L.Text
 quoted = L.pack <$> (open *> inside <* close)
   where
-    open   = char '"'
+    open = char '"'
     inside = many1 $ noneOf "\t\n[]\""
-    close  = char '"'
+    close = char '"'
 
 unquoted :: Parser L.Text
 unquoted = L.pack <$> many1 (noneOf " \t\n[]\"")
@@ -87,13 +87,14 @@ unquoted = L.pack <$> many1 (noneOf " \t\n[]\"")
 
 getTDs :: Char -> Char -> L.Text -> LineParser [L.Text]
 getTDs c e txt = case parse (tds c e) "getTDs" txt of
-    Right elms   -> return elms
-    Left  _      -> fail "| illegal '|elm|elm|"
+    Right elms -> return elms
+    Left _ -> fail "| illegal '|elm|elm|"
 
 tds :: Char -> Char -> Parser [L.Text]
 tds c e = map L.pack <$> many1 (td c e)
 
 td :: Char -> Char -> Parser String
-td c e = ([] <$ char c)
-     <|> try ((\x1 x2 xs -> x1:x2:xs) <$> char e <*> anyChar <*> td c e)
-     <|> ((:) <$> anyChar <*> td c e)
+td c e =
+    ([] <$ char c)
+        <|> try ((\x1 x2 xs -> x1 : x2 : xs) <$> char e <*> anyChar <*> td c e)
+        <|> ((:) <$> anyChar <*> td c e)

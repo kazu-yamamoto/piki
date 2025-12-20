@@ -1,7 +1,11 @@
 module Builder (
-    Builder, (+++), toB, mcatmap, build
-  , module Data.Monoid
-  ) where
+    Builder,
+    (+++),
+    toB,
+    mcatmap,
+    build,
+    module Data.Monoid,
+) where
 
 import Data.Monoid
 import qualified Data.Text.Lazy as L
