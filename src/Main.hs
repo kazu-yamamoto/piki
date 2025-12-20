@@ -1,6 +1,5 @@
 module Main where
 
-import Control.Applicative
 import qualified Data.Text.Lazy.IO as L
 import qualified Data.Version as V
 import Html
