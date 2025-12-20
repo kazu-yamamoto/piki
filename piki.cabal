@@ -42,4 +42,4 @@ Executable piki
                         Paths_piki
 Source-Repository head
   Type:                 git
-  Location:             git://github.com/kazu-yamamoto/piki.git
+  Location:             https://github.com/kazu-yamamoto/piki.git
