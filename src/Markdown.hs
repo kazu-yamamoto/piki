@@ -20,14 +20,14 @@ class ToMD a where
 
 instance ToMD Element where
     toMarkdown HR = "********************************\n"
-    toMarkdown (H n str) = toB (L.pack (replicate n '#')) +++ " " +++ fromXText str +++ "\n"
+    toMarkdown (H n str) = "\n" +++ toB (L.pack (replicate n '#')) +++ " " +++ fromXText str +++ "\n\n"
     toMarkdown (P str) = fromXText str +++ "\n\n"
-    toMarkdown (PRE str) = fromXText str
+    toMarkdown (PRE str) = "\n```\n" +++ fromXText' str +++ "```\n\n"
     toMarkdown (UOL xl) = toMarkdown xl
     toMarkdown (DL ds) = mcatmap toMarkdown ds +++ "\n"
     toMarkdown (IMG is) = mcatmap toMarkdown is +++ "\n"
-    toMarkdown (DIV (Class val) els) = "\n" +++ mcatmap toMarkdown els \\\ ("div", [("class", toB val)]) +++ "\n"
-    toMarkdown (DIV (Id val) els) = "\n" +++ mcatmap toMarkdown els \\\ ("div", [("id", toB val)]) +++ "\n"
+    toMarkdown (DIV (Class val) els) = "\n::::{." +++ toB val +++ "}\n" +++ mcatmap toMarkdown els +++ "\n::::\n\n"
+    toMarkdown (DIV (Id val) els) = "\n::::{#" +++ toB val +++ "}\n" +++ mcatmap toMarkdown els +++ "\n::::\n\n"
     toMarkdown (TABLE _) = "TABLE should be here\n"
 
 instance ToMD Def where
@@ -53,8 +53,29 @@ fromXText :: XText -> Builder
 fromXText = mcatmap toBld
   where
     toBld Null = ""
-    toBld (R c) = toB (L.singleton c) -- xxx asterisk
+    toBld (R c) = referenceChar c
     toBld (E c) = toB (L.singleton c) -- xxx
-    toBld (L xs) = mcatmap toLine xs -- xxx
+    toBld (L xs) = mcatmap (\x -> reference x +++ "\n") xs
     toBld (A title url) = "[" +++ toB title +++ "](" +++ toB url +++ ")"
-    toLine txt = "    " +++ toB txt +++ "\n"
+
+reference :: L.Text -> Builder
+reference = mcatmap referenceChar . L.unpack
+
+referenceChar :: Char -> Builder
+referenceChar '<' = "\\<"
+referenceChar '$' = "\\$"
+referenceChar '#' = "\\#"
+referenceChar '*' = "\\*"
+referenceChar '\\' = "\\\\"
+referenceChar '&' = "\\&"
+referenceChar c = toB (L.singleton c)
+
+fromXText' :: XText -> Builder
+fromXText' = mcatmap toBld
+  where
+    toBld Null = ""
+    toBld (R c) = toB (L.singleton c)
+    toBld (E c) = toB (L.singleton c)
+    toBld (L xs) = mcatmap toLine xs
+    toBld (A title url) = "[" +++ toB title +++ "](" +++ toB url +++ ")"
+    toLine txt = toB txt +++ "\n"
